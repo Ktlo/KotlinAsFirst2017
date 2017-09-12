@@ -113,9 +113,7 @@ fun rookOrBishopThreatens(kingX: Int, kingY: Int,
  * Если такой треугольник не существует, вернуть -1.
  */
 fun triangleKind(a: Double, b: Double, c: Double): Int {
-    val sorted = doubleArrayOf(a, b, c)
-    sorted.sort()
-    val (A, B, C) = sorted
+    val (A, B, C) = doubleArrayOf(a, b, c).apply { sort() }
     if (A + B < C)
         return -1
     else {
