@@ -63,128 +63,128 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  * Например, число 1 содержит 1 цифру, 456 -- 3 цифры, 65536 -- 5 цифр.
  */
 fun digitNumber(n: Int): Int {
-    var number = n
+    var number = Math.abs(n)
     var i = 0
     while (number > 0) {
         number /= 10
         i++
     }
-    return if(i == 0) 1 else i
+    return if (i == 0) 1 else i
 }
 
 /**
- * Простая
- *
- * Найти число Фибоначчи из ряда 1, 1, 2, 3, 5, 8, 13, 21, ... с номером n.
- * Ряд Фибоначчи определён следующим образом: fib(1) = 1, fib(2) = 1, fib(n+2) = fib(n) + fib(n+1)
- */
+* Простая
+*
+* Найти число Фибоначчи из ряда 1, 1, 2, 3, 5, 8, 13, 21, ... с номером n.
+* Ряд Фибоначчи определён следующим образом: fib(1) = 1, fib(2) = 1, fib(n+2) = fib(n) + fib(n+1)
+*/
 
 fun fib(n: Int): Int {
-    //tailrec fun tailfib(n : Int) : Int = if (n < 3) 1 else tailfib(n - 1) + tailfib(n -2)
-    var a = 0; var b =1
-    for (i in 1..n) {
-        val c = a
-        a = b
-        b += c
-    }
-    return a
+//tailrec fun tailfib(n : Int) : Int = if (n < 3) 1 else tailfib(n - 1) + tailfib(n -2)
+var a = 0; var b =1
+for (i in 1..n) {
+    val c = a
+    a = b
+    b += c
+}
+return a
 }
 
 /**
- * Простая
- *
- * Для заданных чисел m и n найти наименьшее общее кратное, то есть,
- * минимальное число k, которое делится и на m и на n без остатка
- */
+* Простая
+*
+* Для заданных чисел m и n найти наименьшее общее кратное, то есть,
+* минимальное число k, которое делится и на m и на n без остатка
+*/
 fun lcm(m: Int, n: Int): Int {
-    fun smallestDiv(m: Int, n: Int): Int {
-        var M = m; var N = n
-        while (M * N > 0) {
-            if (M > N) M -= N
-            else N -= M
-        }
-        return Math.max(M, N)
+fun smallestDiv(m: Int, n: Int): Int {
+    var M = m; var N = n
+    while (M * N > 0) {
+        if (M > N) M -= N
+        else N -= M
     }
-    return m * n / smallestDiv(m, n)
+    return Math.max(M, N)
+}
+return m * n / smallestDiv(m, n)
 }
 
 /**
- * Простая
- *
- * Для заданного числа n > 1 найти минимальный делитель, превышающий 1
- */
+* Простая
+*
+* Для заданного числа n > 1 найти минимальный делитель, превышающий 1
+*/
 fun minDivisor(n: Int): Int {
-    for (i in 2..n) {
-        if (n % i == 0)
-            return i
-    }
-    return n
+for (i in 2..n) {
+    if (n % i == 0)
+        return i
+}
+return n
 }
 
 /**
- * Простая
- *
- * Для заданного числа n > 1 найти максимальный делитель, меньший n
- */
+* Простая
+*
+* Для заданного числа n > 1 найти максимальный делитель, меньший n
+*/
 fun maxDivisor(n: Int): Int {
-    var i = n
-    while (i > 0) {
-        i--
-        if (n % i == 0)
-            return i
-    }
-    return Int.MAX_VALUE
+var i = n
+while (i > 0) {
+    i--
+    if (n % i == 0)
+        return i
+}
+return Int.MAX_VALUE
 }
 
 /**
- * Простая
- *
- * Определить, являются ли два заданных числа m и n взаимно простыми.
- * Взаимно простые числа не имеют общих делителей, кроме 1.
- * Например, 25 и 49 взаимно простые, а 6 и 8 -- нет.
- */
+* Простая
+*
+* Определить, являются ли два заданных числа m и n взаимно простыми.
+* Взаимно простые числа не имеют общих делителей, кроме 1.
+* Например, 25 и 49 взаимно простые, а 6 и 8 -- нет.
+*/
 fun isCoPrime(m: Int, n: Int): Boolean {
-    fun smallestDiv(m: Long, n: Long): Int {
-        var M = m; var N = n
-        while (M * N > 0) {
-            if (M > N) M -= N
-            else N -= M
-        }
-        return Math.max(M.toInt(), N.toInt())
+fun smallestDiv(m: Long, n: Long): Int {
+    var M = m; var N = n
+    while (M * N > 0) {
+        if (M > N) M -= N
+        else N -= M
     }
-    return smallestDiv(m.toLong(), n.toLong()) == 1
+    return Math.max(M.toInt(), N.toInt())
+}
+return smallestDiv(m.toLong(), n.toLong()) == 1
 }
 
 /**
- * Простая
- *
- * Для заданных чисел m и n, m <= n, определить, имеется ли хотя бы один точный квадрат между m и n,
- * то есть, существует ли такое целое k, что m <= k*k <= n.
- * Например, для интервала 21..28 21 <= 5*5 <= 28, а для интервала 51..61 квадрата не существует.
- */
+* Простая
+*
+* Для заданных чисел m и n, m <= n, определить, имеется ли хотя бы один точный квадрат между m и n,
+* то есть, существует ли такое целое k, что m <= k*k <= n.
+* Например, для интервала 21..28 21 <= 5*5 <= 28, а для интервала 51..61 квадрата не существует.
+*/
 fun squareBetweenExists(m: Int, n: Int): Boolean = sqr(Math.ceil(Math.sqrt(m.toDouble()))) <= n
 
 fun sameAngle(x: Double) : Double {
-    val multiplier = Math.floor(x / Math.PI).toInt()
-    return if (multiplier % 2 == 0)
-        +(x - multiplier * Math.PI)
-    else
-        -(x - multiplier * Math.PI)
+val multiplier = Math.floor(x / Math.PI).toInt()
+return if (multiplier % 2 == 0)
+    +(x - multiplier * Math.PI)
+else
+    -(x - multiplier * Math.PI)
 }
 
 /**
- * Средняя
- *
- * Для заданного x рассчитать с заданной точностью eps
- * sin(x) = x - x^3 / 3! + x^5 / 5! - x^7 / 7! + ...
- * Нужную точность считать достигнутой, если очередной член ряда меньше eps по модулю
- */
+* Средняя
+*
+* Для заданного x рассчитать с заданной точностью eps
+* sin(x) = x - x^3 / 3! + x^5 / 5! - x^7 / 7! + ...
+* Нужную точность считать достигнутой, если очередной член ряда меньше eps по модулю
+*/
 fun sin(x: Double, eps: Double): Double {
     val X = sameAngle(x)
 
     var i = 0
     var next = 100.0
-    var divider = 1L
+    var divider = 1.0
     var numerator = 1.0
     var sum = 0.0
     //println("sin(${x * 180 / Math.PI}') = sin(${X * 180 / Math.PI}')")
@@ -205,18 +205,18 @@ fun sin(x: Double, eps: Double): Double {
 }
 
 /**
- * Средняя
- *
- * Для заданного x рассчитать с заданной точностью eps
- * cos(x) = 1 - x^2 / 2! + x^4 / 4! - x^6 / 6! + ...
- * Нужную точность считать достигнутой, если очередной член ряда меньше eps по модулю
- */
+* Средняя
+*
+* Для заданного x рассчитать с заданной точностью eps
+* cos(x) = 1 - x^2 / 2! + x^4 / 4! - x^6 / 6! + ...
+* Нужную точность считать достигнутой, если очередной член ряда меньше eps по модулю
+*/
 fun cos(x: Double, eps: Double): Double {
     val X = sameAngle(x + Math.PI / 2) - Math.PI / 2
 
     var i = 0
     var next = 100.0
-    var divider = 1L
+    var divider = 1.0
     var numerator = 1.0
     var sum = 1.0
     //println("cos(${x * 180 / Math.PI}') = cos(${X * 180 / Math.PI}')")
@@ -237,79 +237,90 @@ fun cos(x: Double, eps: Double): Double {
 }
 
 /**
- * Средняя
- *
- * Поменять порядок цифр заданного числа n на обратный: 13478 -> 87431.
- * Не использовать строки при решении задачи.
- */
+* Средняя
+*
+* Поменять порядок цифр заданного числа n на обратный: 13478 -> 87431.
+* Не использовать строки при решении задачи.
+*/
 fun revert(n: Int): Int {
-    var input = n
-    var output = 0
-    while (input > 0) {
-        output = output * 10 + input % 10
-        input /= 10
-    }
-    return output
+var input = n
+var output = 0
+while (input > 0) {
+    output = output * 10 + input % 10
+    input /= 10
+}
+return output
 }
 
 /**
- * Средняя
- *
- * Проверить, является ли заданное число n палиндромом:
- * первая цифра равна последней, вторая -- предпоследней и так далее.
- * 15751 -- палиндром, 3653 -- нет.
- */
+* Средняя
+*
+* Проверить, является ли заданное число n палиндромом:
+* первая цифра равна последней, вторая -- предпоследней и так далее.
+* 15751 -- палиндром, 3653 -- нет.
+*/
 fun isPalindrome(n: Int): Boolean = revert(n) == n
 
 /**
- * Средняя
- *
- * Для заданного числа n определить, содержит ли оно различающиеся цифры.
- * Например, 54 и 323 состоят из разных цифр, а 111 и 0 из одинаковых.
- */
+* Средняя
+*
+* Для заданного числа n определить, содержит ли оно различающиеся цифры.
+* Например, 54 и 323 состоят из разных цифр, а 111 и 0 из одинаковых.
+*/
 fun hasDifferentDigits(n: Int): Boolean {
-    val digit = n % 10
-    var input = n / 10
-    while (input > 0) {
-        if (input % 10 != digit)
-            return true
-        input /= 10
-    }
-    return false
+val digit = n % 10
+var input = n / 10
+while (input > 0) {
+    if (input % 10 != digit)
+        return true
+    input /= 10
+}
+return false
+}
+
+private fun digitNumberLog(n: Int) =
+        if (n == 0) 1 else Math.ceil(Math.log10((n + 1).toDouble())).toInt()
+
+private fun getDigit(n: Int, i: Int) : Int {
+    var divider = 1
+    for (j in 1..i)
+        divider *= 10
+    return n / divider % 10
 }
 
 /**
- * Сложная
- *
- * Найти n-ю цифру последовательности из квадратов целых чисел:
- * 149162536496481100121144...
- * Например, 2-я цифра равна 4, 7-я 5, 12-я 6.
- */
+* Сложная
+*
+* Найти n-ю цифру последовательности из квадратов целых чисел:
+* 149162536496481100121144...
+* Например, 2-я цифра равна 4, 7-я 5, 12-я 6.
+*/
 fun squareSequenceDigit(n: Int): Int {
-    var sequence = "1"
     var i = 1
-    while (sequence.length < n) {
-        i++
-        sequence += (i * i).toString()
+    var sq = 1
+    while (i < n) {
+        sq++
+        i += digitNumberLog(sq * sq)
     }
-    return (sequence[n - 1] - '0')
+    return getDigit(sq * sq, i - n)
 }
 
 /**
- * Сложная
- *
- * Найти n-ю цифру последовательности из чисел Фибоначчи (см. функцию fib выше):
- * 1123581321345589144...
- * Например, 2-я цифра равна 1, 9-я 2, 14-я 5.
- */
+* Сложная
+*
+* Найти n-ю цифру последовательности из чисел Фибоначчи (см. функцию fib выше):
+* 1123581321345589144...
+* Например, 2-я цифра равна 1, 9-я 2, 14-я 5.
+*/
 fun fibSequenceDigit(n: Int): Int {
-    var sequence = "1"
-    var a = 0; var b = 1
-    while (sequence.length < n) {
+    var a = 0
+    var b = 1
+    var i = 1
+    while (i < n) {
         val c = a
         a = b
         b += c
-        sequence += b.toString()
+        i += digitNumberLog(b)
     }
-    return sequence[n - 1] - '0'
+    return getDigit(b, i - n)
 }
