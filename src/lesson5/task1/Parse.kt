@@ -58,6 +58,17 @@ fun main(args: Array<String>) {
     }
 }
 
+private class Month(val number : String, val maxData : Int)
+
+private val months = mapOf(
+        "январь" to Month("01", 31), "февраль" to Month("02", 29), "март" to Month("03", 31),
+        "апрель" to Month("01", 31), "май" to Month("02", 29), "июнь" to Month("03", 31),
+        "июль" to Month("01", 31), "август" to Month("02", 29), "сентябрь" to Month("03", 31),
+        "октябрь" to Month("01", 31), "ноябрь" to Month("02", 29), "декабрь" to Month("03", 31)
+)
+
+private val dateStrToDigit_regex = Regex("^[0-9]{2} [а-я]{3,} $[0-9]{4}")
+
 /**
  * Средняя
  *
@@ -66,7 +77,22 @@ fun main(args: Array<String>) {
  * День и месяц всегда представлять двумя цифрами, например: 03.04.2011.
  * При неверном формате входной строки вернуть пустую строку
  */
-fun dateStrToDigit(str: String): String = TODO()
+fun dateStrToDigit(str: String): String {
+    if (!(str matches dateStrToDigit_regex))
+        return ""
+    val (data_num, month, year) = str.split('.')
+    return if (months.containsKey(month) && data_num.toInt() in 1..months[month]!!.maxData)
+        "$data_num.${months[month]!!.number}.$year"
+    else
+        ""
+}
+
+private val month_names = arrayOf("", "январь", "февраль", "март",
+                            "апрель", "май", "июнь",
+                            "июль", "август", "сентябрь",
+                            "октябрь", "ноябрь", "декабрь")
+
+private val dateDigitToStr_regex = Regex("^[0-9]{2}\\.[а-я]{3,}\\.[0-9]{4}$")
 
 /**
  * Средняя
@@ -75,7 +101,17 @@ fun dateStrToDigit(str: String): String = TODO()
  * Перевести её в строковый формат вида "15 июля 2016".
  * При неверном формате входной строки вернуть пустую строку
  */
-fun dateDigitToStr(digital: String): String = TODO()
+fun dateDigitToStr(digital: String): String {
+    if (!(digital matches dateDigitToStr_regex))
+        return ""
+    val (data_num, month, year) = digital.split('.')
+    val m = month.toInt()
+    return if (m < month_names.size)
+        "$data_num ${month_names[m]} $year"
+    else ""
+}
+
+private val telephone_regex = Regex("^\\s*(\\+7)?[\\s\\-]*(\\(\\d{3}\\))?([\\s\\-]*\\d){7}\\s*$")
 
 /**
  * Средняя
@@ -89,7 +125,13 @@ fun dateDigitToStr(digital: String): String = TODO()
  * Все символы в номере, кроме цифр, пробелов и +-(), считать недопустимыми.
  * При неверном формате вернуть пустую строку
  */
-fun flattenPhoneNumber(phone: String): String = TODO()
+fun flattenPhoneNumber(phone: String): String =
+    if (phone matches telephone_regex)
+        phone.replace(" ", "").replace("-", "")
+    else ""
+
+private val bestLongJump_regex = Regex("^(\\d+|-|%)( (\\d+|-|%))*$")
+private val bestLongJump_regex_nums = Regex("\\d+")
 
 /**
  * Средняя
@@ -101,7 +143,16 @@ fun flattenPhoneNumber(phone: String): String = TODO()
  * Прочитать строку и вернуть максимальное присутствующее в ней число (717 в примере).
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
-fun bestLongJump(jumps: String): Int = TODO()
+fun bestLongJump(jumps: String): Int {
+    var max_jump = -1
+    if (jumps matches bestLongJump_regex)
+        for (num in bestLongJump_regex_nums.findAll(jumps)) {
+            val curr = num.value.toInt()
+            if (curr > max_jump)
+                max_jump = curr
+        }
+    return max_jump
+}
 
 /**
  * Сложная
