@@ -1,6 +1,8 @@
 @file:Suppress("UNUSED_PARAMETER")
 package lesson5.task1
 
+import lesson4.task1.RomanDigits
+
 /**
  * Пример
  *
@@ -61,13 +63,13 @@ fun main(args: Array<String>) {
 private class Month(val number : String, val maxData : Int)
 
 private val months = mapOf(
-        "январь" to Month("01", 31), "февраль" to Month("02", 29), "март" to Month("03", 31),
-        "апрель" to Month("01", 31), "май" to Month("02", 29), "июнь" to Month("03", 31),
-        "июль" to Month("01", 31), "август" to Month("02", 29), "сентябрь" to Month("03", 31),
-        "октябрь" to Month("01", 31), "ноябрь" to Month("02", 29), "декабрь" to Month("03", 31)
+        "января" to Month("01", 31), "февраля" to Month("02", 29), "марта" to Month("03", 31),
+        "апреля" to Month("04", 31), "мая" to Month("05", 29), "июня" to Month("06", 31),
+        "июля" to Month("07", 31), "августа" to Month("08", 29), "сентября" to Month("09", 31),
+        "октября" to Month("10", 31), "ноября" to Month("11", 29), "декабря" to Month("12", 31)
 )
 
-private val dateStrToDigit_regex = Regex("^[0-9]{2} [а-я]{3,} $[0-9]{4}")
+private val dateStrToDigit_regex = Regex("^\\d{1,2} [а-я]{3,} \\d{1,4}$")
 
 /**
  * Средняя
@@ -80,19 +82,20 @@ private val dateStrToDigit_regex = Regex("^[0-9]{2} [а-я]{3,} $[0-9]{4}")
 fun dateStrToDigit(str: String): String {
     if (!(str matches dateStrToDigit_regex))
         return ""
-    val (data_num, month, year) = str.split('.')
+    val (data_num, month, year) = str.split(' ')
     return if (months.containsKey(month) && data_num.toInt() in 1..months[month]!!.maxData)
-        "$data_num.${months[month]!!.number}.$year"
+        "${if (data_num.length == 1) "0"+data_num else data_num}.${months[month]!!.number}.${"0".repeat(4-year.length)+year}"
     else
         ""
 }
 
-private val month_names = arrayOf("", "январь", "февраль", "март",
-                            "апрель", "май", "июнь",
-                            "июль", "август", "сентябрь",
-                            "октябрь", "ноябрь", "декабрь")
+private val month_array = months.values.toTypedArray()
+private val month_names = arrayOf("января", "февраля", "марта",
+                                "апреля", "мая", "июня",
+                                "июля", "августа", "сентября",
+                                "октября", "ноября", "декабря")
 
-private val dateDigitToStr_regex = Regex("^[0-9]{2}\\.[а-я]{3,}\\.[0-9]{4}$")
+private val dateDigitToStr_regex = Regex("^\\d{2}\\.\\d{2}\\.\\d{4}$")
 
 /**
  * Средняя
@@ -105,13 +108,16 @@ fun dateDigitToStr(digital: String): String {
     if (!(digital matches dateDigitToStr_regex))
         return ""
     val (data_num, month, year) = digital.split('.')
-    val m = month.toInt()
-    return if (m < month_names.size)
-        "$data_num ${month_names[m]} $year"
+    val m = month.toInt() - 1
+    val d = data_num.toInt()
+    return if (m in 0..11 && d in 1..month_array[m].maxData)
+        "$d ${month_names[m]} ${year.toInt()}"
     else ""
 }
 
-private val telephone_regex = Regex("^\\s*(\\+7)?[\\s\\-]*(\\(\\d{3}\\))?([\\s\\-]*\\d){7}\\s*$")
+private val telephone_regex = Regex("^\\s*(\\+\\d+)?[\\s\\-]*(\\(\\d+\\))?([\\s\\-]*\\d)+\\s*$")
+
+private val telephone_regex_replace = Regex("[\\Q-() \\E]")
 
 /**
  * Средняя
@@ -127,7 +133,8 @@ private val telephone_regex = Regex("^\\s*(\\+7)?[\\s\\-]*(\\(\\d{3}\\))?([\\s\\
  */
 fun flattenPhoneNumber(phone: String): String =
     if (phone matches telephone_regex)
-        phone.replace(" ", "").replace("-", "")
+        phone.replace(telephone_regex_replace, "")
+        //phone.replace(" ", "").replace("-", "")
     else ""
 
 private val bestLongJump_regex = Regex("^(\\d+|-|%)( (\\d+|-|%))*$")
@@ -166,6 +173,8 @@ fun bestLongJump(jumps: String): Int {
  */
 fun bestHighJump(jumps: String): Int = TODO()
 
+private val plusMinus_assert_regex = Regex("\\d+( [+\\-] \\d+)*")
+private val plusMinus_number = Regex("\\d+")
 /**
  * Сложная
  *
@@ -175,7 +184,21 @@ fun bestHighJump(jumps: String): Int = TODO()
  * Вернуть значение выражения (6 для примера).
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
-fun plusMinus(expression: String): Int = TODO()
+fun plusMinus(expression: String): Int {
+    var summ = 0
+    var sign = true
+    require(expression matches plusMinus_assert_regex)
+    for (one in expression.split(' ')) {
+        when {
+            one matches plusMinus_number -> summ += if (sign) one.toInt() else -one.toInt()
+            one == "+" -> sign = true
+            else -> sign = false
+        }
+    }
+    return summ
+}
+
+private val firstDuplicateIndex_word_regex = Regex("\\S+")
 
 /**
  * Сложная
@@ -186,7 +209,24 @@ fun plusMinus(expression: String): Int = TODO()
  * Вернуть индекс начала первого повторяющегося слова, или -1, если повторов нет.
  * Пример: "Он пошёл в в школу" => результат 9 (индекс первого 'в')
  */
-fun firstDuplicateIndex(str: String): Int = TODO()
+fun firstDuplicateIndex(str: String): Int {
+    var last_word = ""
+    var last_index = -1
+    for (word in firstDuplicateIndex_word_regex.findAll(str)) {
+        if (word.value.compareTo(last_word, ignoreCase = true) == 0)
+            return last_index
+        else {
+            last_word = word.value
+            last_index = word.range.start
+        }
+    }
+    return -1
+}
+
+private val mostExpensive_regex = Regex("^(([а-я]|[А-Я]|Ё|ё)+ \\d+\\.\\d; )*(([а-я]|[А-Я]|Ё|ё)+ \\d+\\.\\d)$")
+private val mostExpensive_each = Regex("([а-я]|[А-Я]|Ё|ё)+ \\d+\\.\\d")
+private val mostExpensive_product = Regex("([а-я]|[А-Я]|Ё|ё)+")
+private val mostExpensive_price = Regex("\\d+\\.\\d")
 
 /**
  * Сложная
@@ -199,7 +239,20 @@ fun firstDuplicateIndex(str: String): Int = TODO()
  * или пустую строку при нарушении формата строки.
  * Все цены должны быть положительными
  */
-fun mostExpensive(description: String): String = TODO()
+fun mostExpensive(description: String): String {
+    if (!(description matches mostExpensive_regex))
+        return ""
+    var max_price = .0
+    var product_name = ""
+    for (each in mostExpensive_each.findAll(description)) {
+        val price = mostExpensive_price.find(each.value)!!.value.toDouble()
+        if (price > max_price) {
+            max_price = price
+            product_name = mostExpensive_product.find(each.value)!!.value
+        }
+    }
+    return product_name
+}
 
 /**
  * Сложная
@@ -212,7 +265,62 @@ fun mostExpensive(description: String): String = TODO()
  *
  * Вернуть -1, если roman не является корректным римским числом
  */
-fun fromRoman(roman: String): Int = TODO()
+fun fromRoman(roman: String): Int {
+    var result = 0
+    var index = 0
+    var correct = false
+    // Е-ее-еее!!!! Коуде реюзабилити!
+    for (symbol in RomanDigits.values()) {
+        val name = symbol.name
+        val symbol_len = name.length
+        while (roman.length - index >= symbol_len && roman.substring(index, index + symbol_len) == name) {
+            result += symbol.number
+            index += symbol_len
+            correct = true
+        }
+    }
+    return if (correct) result else -1
+}
+
+private val brainFuck_regex = Regex("^[\\Q+-<>[] \\E]+$")
+
+private fun requireBrainFuck(commands: String) {
+    require(commands matches brainFuck_regex)
+    var braces = 0
+    for (i in 0 until commands.length) {
+        when (commands[i]) {
+            '[' -> braces++
+            ']' -> braces--
+        }
+    }
+    require(braces == 0)
+}
+
+private fun braceEnds(commands: String, offset: Int): Int {
+    var braces = 1
+    var ptr = offset
+    while (braces > 0) {
+        ptr++
+        when (commands[ptr]) {
+            '[' -> braces++
+            ']' -> braces--
+        }
+    }
+    return ptr
+}
+
+private fun braceBegin(commands: String, offset: Int): Int {
+    var braces = 1
+    var ptr = offset
+    while (braces > 0) {
+        ptr--
+        when (commands[ptr]) {
+            '[' -> braces--
+            ']' -> braces++
+        }
+    }
+    return ptr
+}
 
 /**
  * Очень сложная
@@ -250,4 +358,36 @@ fun fromRoman(roman: String): Int = TODO()
  * IllegalArgumentException должен бросаться даже если ошибочная команда не была достигнута в ходе выполнения.
  *
  */
-fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> = TODO()
+fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
+    requireBrainFuck(commands)
+    val list = MutableList(cells) {0}
+    var counter = limit
+    var list_ptr = cells / 2
+    var cmd_ptr = 0
+    val end = commands.length
+    while (counter > 0) {
+        if (cmd_ptr == end)
+            break
+        when (commands[cmd_ptr]) {
+            '+' -> list[list_ptr]++
+            '-' -> list[list_ptr]--
+            '>' -> {
+                list_ptr++
+                assert(list_ptr < cells)
+            }
+            '<' -> {
+                list_ptr--
+                assert(list_ptr > 0)
+            }
+            '[' -> if (list[list_ptr] == 0) {
+                cmd_ptr = braceEnds(commands, cmd_ptr)
+            }
+            ']' -> if (list[list_ptr] != 0) {
+                cmd_ptr = braceBegin(commands, cmd_ptr)
+            }
+        }
+        cmd_ptr++
+        counter--
+    }
+    return list
+}

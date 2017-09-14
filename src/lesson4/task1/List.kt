@@ -288,7 +288,7 @@ fun decimalFromString(str: String, base: Int): Int {
     return result
 }
 
-private enum class RomanDigits (val number : Int) {
+enum class RomanDigits (val number : Int) {
     MMM(3000), MM(2000), M(1000), CM(900),
     DCCC(800), DCC(700), DC(600), D(500), CD(400),
     CCC(300), CC(200), C(100), XC(90),
