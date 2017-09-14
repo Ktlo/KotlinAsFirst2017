@@ -373,11 +373,11 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
             '-' -> list[list_ptr]--
             '>' -> {
                 list_ptr++
-                assert(list_ptr < cells)
+                check(list_ptr < cells)
             }
             '<' -> {
                 list_ptr--
-                assert(list_ptr > 0)
+                check(list_ptr > 0)
             }
             '[' -> if (list[list_ptr] == 0) {
                 cmd_ptr = braceEnds(commands, cmd_ptr)
