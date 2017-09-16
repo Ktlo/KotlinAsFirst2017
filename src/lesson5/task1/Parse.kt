@@ -69,7 +69,7 @@ private val months = mapOf(
         "октября" to Month("10", 31), "ноября" to Month("11", 29), "декабря" to Month("12", 31)
 )
 
-private val dateStrToDigit_regex = Regex("^\\d{1,2} [а-я]{3,} \\d{1,4}$")
+private val dateStrToDigit_regex = Regex("^\\d{1,2} [а-я]{3,} \\d+$")
 
 /**
  * Средняя
@@ -84,7 +84,7 @@ fun dateStrToDigit(str: String): String {
         return ""
     val (data_num, month, year) = str.split(' ')
     return if (months.containsKey(month) && data_num.toInt() in 1..months[month]!!.maxData)
-        "${if (data_num.length == 1) "0"+data_num else data_num}.${months[month]!!.number}.${"0".repeat(4-year.length)+year}"
+        "${if (data_num.length == 1) "0"+data_num else data_num}.${months[month]!!.number}.$year"
     else
         ""
 }
@@ -95,7 +95,7 @@ private val month_names = arrayOf("января", "февраля", "марта"
                                 "июля", "августа", "сентября",
                                 "октября", "ноября", "декабря")
 
-private val dateDigitToStr_regex = Regex("^\\d{2}\\.\\d{2}\\.\\d{4}$")
+private val dateDigitToStr_regex = Regex("^\\d{2}\\.\\d{2}\\.\\d+$")
 
 /**
  * Средняя
@@ -223,9 +223,9 @@ fun firstDuplicateIndex(str: String): Int {
     return -1
 }
 
-private val mostExpensive_regex = Regex("^(([а-я]|[А-Я]|Ё|ё)+ \\d+\\.\\d; )*(([а-я]|[А-Я]|Ё|ё)+ \\d+\\.\\d)$")
-private val mostExpensive_each = Regex("([а-я]|[А-Я]|Ё|ё)+ \\d+\\.\\d")
-private val mostExpensive_product = Regex("([а-я]|[А-Я]|Ё|ё)+")
+private val mostExpensive_regex = Regex("^(([а-я]|[А-Я]|Ё|ё|\\w)+ \\d+\\.\\d; )*(([а-я]|[А-Я]|Ё|ё|\\w)+ \\d+\\.\\d)$")
+private val mostExpensive_each = Regex("([а-я]|[А-Я]|Ё|ё|\\w)+ \\d+\\.\\d")
+private val mostExpensive_product = Regex("([а-я]|[А-Я]|Ё|ё|\\w)+")
 private val mostExpensive_price = Regex("\\d+\\.\\d")
 
 /**
@@ -254,6 +254,8 @@ fun mostExpensive(description: String): String {
     return product_name
 }
 
+private val fromRoman_regex = Regex("^M*(CM)?((DC{0,3})|(CD)|C{1,3})?(XC|LX{0,3}|XL|X{1,3})?(IX|VI{0,3}|IV|I{1,3})?$")
+
 /**
  * Сложная
  *
@@ -266,6 +268,8 @@ fun mostExpensive(description: String): String {
  * Вернуть -1, если roman не является корректным римским числом
  */
 fun fromRoman(roman: String): Int {
+    if (!(roman matches fromRoman_regex))
+        return -1
     var result = 0
     var index = 0
     var correct = false
@@ -282,7 +286,7 @@ fun fromRoman(roman: String): Int {
     return if (correct) result else -1
 }
 
-private val brainFuck_regex = Regex("^[\\Q+-<>[] \\E]+$")
+private val brainFuck_regex = Regex("^[\\Q+-<>[] \\E]*$")
 
 private fun requireBrainFuck(commands: String) {
     require(commands matches brainFuck_regex)
@@ -377,7 +381,7 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
             }
             '<' -> {
                 list_ptr--
-                check(list_ptr > 0)
+                check(list_ptr >= 0)
             }
             '[' -> if (list[list_ptr] == 0) {
                 cmd_ptr = braceEnds(commands, cmd_ptr)
