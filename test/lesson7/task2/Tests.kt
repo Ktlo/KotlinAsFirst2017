@@ -49,6 +49,21 @@ class Tests {
                         listOf(10, 11, 12, 5),
                         listOf(9, 8, 7, 6)
                 )), generateSpiral(3, 4))
+
+        // Ktlo's tests
+
+        assertEquals(createMatrix(1, 5,
+                listOf(
+                        listOf(1, 2, 3, 4, 5)
+                )), generateSpiral(1, 5))
+        assertEquals(createMatrix(5, 1,
+                listOf(
+                        listOf(1),
+                        listOf(2),
+                        listOf(3),
+                        listOf(4),
+                        listOf(5)
+                )), generateSpiral(5, 1))
     }
 
     @Test

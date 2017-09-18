@@ -161,6 +161,9 @@ fun bestLongJump(jumps: String): Int {
     return max_jump
 }
 
+private val assertJumps = Regex("(\\d+ [+\\-%]+ )*\\d+ [+\\-%]+")
+private val findAllJumps = Regex("\\d+ [\\-%]*\\+")
+private val height_regex = Regex("\\d+")
 /**
  * Сложная
  *
@@ -171,7 +174,17 @@ fun bestLongJump(jumps: String): Int {
  * Прочитать строку и вернуть максимальную взятую высоту (230 в примере).
  * При нарушении формата входной строки вернуть -1.
  */
-fun bestHighJump(jumps: String): Int = TODO()
+fun bestHighJump(jumps: String): Int {
+    if (!(jumps matches assertJumps))
+        return -1
+    var most_high = 0
+    for (jump in findAllJumps.findAll(jumps)) {
+        val curr_jump = height_regex.find(jump.value)!!.value.toInt()
+        if (curr_jump > most_high)
+            most_high = curr_jump
+    }
+    return most_high
+}
 
 private val plusMinus_assert_regex = Regex("\\d+( [+\\-] \\d+)*")
 private val plusMinus_number = Regex("\\d+")

@@ -53,8 +53,22 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
  * Регистр букв игнорировать, то есть буквы е и Е считать одинаковыми.
  *
  */
-fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> = TODO()
-
+fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
+    val input = File(inputName).readText()
+    val result = mutableMapOf<String, Int>()
+    for (string in substrings) {
+        var counter = 0
+        val first_letter = string.first().toLowerCase()
+        for (i in 0 .. input.length - string.length) {
+            if (input[i].toLowerCase() == first_letter &&
+                    input.substring(i, i + string.length).compareTo(string, ignoreCase = true) == 0) {
+                counter++
+            }
+        }
+        result[string] = counter
+    }
+    return result
+}
 
 /**
  * Средняя
@@ -70,7 +84,20 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
  *
  */
 fun sibilants(inputName: String, outputName: String) {
-    TODO()
+    val result = File(inputName).readText().toCharArray()
+    for (i in 0 until result.size - 1) {
+        when (result[i]) {
+            'Ж', 'ж', 'Ч', 'ч', 'Ш', 'ш', 'Щ', 'щ' -> when (result[i + 1]) {
+                'Ы' -> result[i + 1] = 'И'
+                'ы' -> result[i + 1] = 'и'
+                'Я' -> result[i + 1] = 'А'
+                'я' -> result[i + 1] = 'а'
+                'Ю' -> result[i + 1] = 'У'
+                'ю' -> result[i + 1] = 'у'
+            }
+        }
+    }
+    File(outputName).writeText(result.joinToString(separator = ""))
 }
 
 /**
@@ -91,8 +118,21 @@ fun sibilants(inputName: String, outputName: String) {
  *
  */
 fun centerFile(inputName: String, outputName: String) {
-    TODO()
+    val lines = File(inputName).readLines().map { it.trim() }
+    var max_size = 0
+    for (line in lines)
+        if (max_size < line.length)
+            max_size = line.length
+    val output_stream = File(outputName).bufferedWriter()
+    for (line in lines) {
+        val delta = (max_size - line.length) / 2
+        output_stream.write("${" ".repeat(if (delta < 0) 0 else delta)}$line\n")
+    }
+
+    output_stream.close()
 }
+
+private val word_pattern = Regex("\\S+")
 
 /**
  * Сложная
@@ -122,7 +162,40 @@ fun centerFile(inputName: String, outputName: String) {
  * 8) Если входной файл удовлетворяет требованиям 1-7, то он должен быть в точности идентичен выходному файлу
  */
 fun alignFileByWidth(inputName: String, outputName: String) {
-    TODO()
+    val lines = File(inputName).readLines().map { it.trim() }
+    var max_size = 0
+    for (line in lines)
+        if (max_size < line.length)
+            max_size = line.length
+
+    val output_stream = File(outputName).bufferedWriter()
+    for (line in lines) {
+        val whitespaces = max_size - line.length + line.count { it == ' ' }
+        val words =  word_pattern.findAll(line)
+        val words_number = words.count()
+        if (words_number == 0) {
+            output_stream.write("\n")
+            continue
+        }
+        val median = whitespaces / words_number
+        val module = whitespaces % words_number
+        var i = 0
+        var isFirst = true
+        for (word in words) {
+            if (isFirst) {
+                output_stream.write(word.value)
+                isFirst = false
+            }
+            else
+                output_stream.write("${" ".repeat(median + i)}${word.value}")
+            i++
+            if (i > module)
+                i = 0
+        }
+        output_stream.write("\n")
+    }
+
+    output_stream.close()
 }
 
 /**

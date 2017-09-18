@@ -317,7 +317,6 @@ private class KnightDoneException : Exception()
  * Если возможно несколько вариантов самой быстрой траектории, вернуть любой из них.
  */
 fun knightTrajectory(start: Square, end: Square): List<Square> {
-    TODO()
     val result = mutableListOf<Square>()
 
     fun nextStep(left: Int, previous: PreviousStep) {
