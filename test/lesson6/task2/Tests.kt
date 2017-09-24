@@ -129,6 +129,8 @@ class Tests {
         kingTrajectory(square("c2"), square("a6")).assertKingTrajectory(square("c2"), square("a6"), 4)
         assertEquals(listOf(square("h2"), square("g3"), square("f4"), square("e5"), square("d6"), square("c7")),
                 kingTrajectory(square("h2"), square("c7")))
+
+        kingTrajectory(Square(4, 6), Square(8, 1)).assertKingTrajectory(Square(4, 6), Square(8, 1), 5)
     }
 
     @Test

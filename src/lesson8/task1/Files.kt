@@ -1,7 +1,10 @@
 @file:Suppress("UNUSED_PARAMETER")
 package lesson8.task1
 
+import java.io.BufferedOutputStream
+import java.io.BufferedWriter
 import java.io.File
+import java.util.*
 
 /**
  * Пример
@@ -173,30 +176,34 @@ fun alignFileByWidth(inputName: String, outputName: String) {
         val whitespaces = max_size - line.length + line.count { it == ' ' }
         val words =  word_pattern.findAll(line)
         val words_number = words.count()
-        if (words_number == 0) {
-            output_stream.write("\n")
-            continue
-        }
-        val median = whitespaces / words_number
-        val module = whitespaces % words_number
-        var i = 0
-        var isFirst = true
-        for (word in words) {
-            if (isFirst) {
-                output_stream.write(word.value)
-                isFirst = false
+        when (words_number) {
+            0 -> {}
+            1 -> output_stream.write(words.first().value)
+            else -> {
+                val space_number = words_number - 1
+                val median = whitespaces / space_number
+                val module = whitespaces % space_number + 1
+                var i = 0
+                var isFirst = true
+                for (word in words) {
+                    if (isFirst) {
+                        output_stream.write(word.value)
+                        isFirst = false
+                    }
+                    else {
+                        output_stream.write("${" ".repeat(median + if (i / module == 0) 1 else 0)}${word.value}")
+                    }
+                    i++
+                }
             }
-            else
-                output_stream.write("${" ".repeat(median + i)}${word.value}")
-            i++
-            if (i > module)
-                i = 0
         }
         output_stream.write("\n")
     }
 
     output_stream.close()
 }
+
+private val just_words = Regex("([а-я]|[А-Я]|\\w)+")
 
 /**
  * Средняя
@@ -212,7 +219,27 @@ fun alignFileByWidth(inputName: String, outputName: String) {
  * Ключи в ассоциативном массиве должны быть в нижнем регистре.
  *
  */
-fun top20Words(inputName: String): Map<String, Int> = TODO()
+fun top20Words(inputName: String): Map<String, Int> {
+    val input = File(inputName).readText()
+    val result = mutableMapOf<String, Int>()
+
+    for (word in just_words.findAll(input)) {
+        val value = word.value.toLowerCase()
+        if (result.containsKey(value))
+            result[value] = result[value]!! + 1
+        else
+            result[value] = 1
+    }
+
+    val sorted = result.toSortedMap(Comparator {
+        a, b ->
+        if (b == "с" || a == "с") println("$a=${result[a]} ? $b=${result[b]}")
+        result[b]!!.compareTo(result[a]!!)
+    })
+
+    val keys = sorted.keys
+    return sorted.headMap(if (keys.size > 20) keys.elementAt(20) else keys.elementAt(keys.size - 1))
+}
 
 /**
  * Средняя
@@ -241,7 +268,23 @@ fun top20Words(inputName: String): Map<String, Int> = TODO()
  * Обратите внимание: данная функция не имеет возвращаемого значения
  */
 fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: String) {
-    TODO()
+    val input = File(inputName).bufferedReader()
+    val output = File(outputName).bufferedWriter()
+
+    while (input.ready()) {
+        val symbol = input.read().toChar()
+        if (dictionary.containsKey(symbol.toLowerCase()) || dictionary.containsKey(symbol.toUpperCase())) {
+            var replaceString = (dictionary[symbol.toLowerCase()] ?: dictionary[symbol.toUpperCase()])!!
+            if (symbol.isUpperCase())
+                replaceString = replaceString.first().toUpperCase() + replaceString.substring(1)
+            output.write(replaceString)
+        }
+        else
+            output.write(symbol.toString())
+    }
+
+    input.close()
+    output.close()
 }
 
 /**
@@ -269,7 +312,124 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
  * Обратите внимание: данная функция не имеет возвращаемого значения
  */
 fun chooseLongestChaoticWord(inputName: String, outputName: String) {
-    TODO()
+    val input = File(inputName).bufferedReader()
+    val specialWords = mutableListOf<String>()
+
+    while (input.ready()) {
+        val string = input.readLine()!!
+        val word = string.toCharArray().map { it.toLowerCase() }
+        var areLettersDifferent = true
+        val length = word.size
+        comparingLetters@for (i in 0 until length - 1) {
+            val char = word[i]
+            for (letter in i + 1 until length) {
+                if (char == word[letter]) {
+                    areLettersDifferent = false
+                    break@comparingLetters
+                }
+            }
+        }
+        if (areLettersDifferent)
+            specialWords.add(string)
+    }
+    specialWords.sortWith(Comparator { a, b -> b.length.compareTo(a.length) })
+    val maxLength = specialWords.first().length
+
+    val output = File(outputName).bufferedWriter()
+
+    var isFirst = true
+    for (word in specialWords) {
+        if (word.length == maxLength) {
+            if (isFirst) {
+                output.write(word)
+                isFirst = false
+            }
+            else
+                output.write(", $word")
+        }
+    }
+
+    input.close()
+    output.close()
+}
+
+typealias HTML = BufferedWriter
+typealias Paragraph = String
+
+private fun beginHtmlBody(filename: String): HTML {
+    val output = File(filename).bufferedWriter()
+    output.write("<html>\n\t<body>\n")
+    return output
+}
+
+private fun HTML.endHtmlBody() {
+    write("\n\t</body>\n</html>")
+    close()
+}
+
+private fun HTML.addParagraph(paragraph: Paragraph) {
+    write("\t\t<p>\n")
+    for (line in paragraph.lines()) {
+        write("\t\t\t$line\n")
+    }
+    write("\t\t</p>\n")
+}
+
+private fun splitParagraphsFromFile(filename: String): MutableList<Paragraph> {
+    val result = mutableListOf<String>()
+    for (line in File(filename).readText().split("\n\n")) {
+        if (line.isNotBlank())
+            result.add(line)
+    }
+    return result
+}
+
+private fun MutableList<String>.addCanceled(string: Paragraph) {
+    var isCanceled = false
+    for (text in string.split("~~")) {
+        if (isCanceled)
+            add("<s>")
+        addBold(text)
+        if (isCanceled)
+            add("</s>")
+        isCanceled = !isCanceled
+    }
+
+}
+
+private val boldBorders = Regex("\\*\\*\\S(.+\\S)?\\*?\\*\\*")
+
+private fun MutableList<String>.addBold(string: String) {
+    var lastIndex = 0
+    for (text in boldBorders.findAll(string)) {
+        addCursive(string.substring(lastIndex, text.range.start - 1))
+        lastIndex = text.range.last + 1
+        add("<b>")
+        addCursive(string.substring(text.range.start + 2, text.range.last - 2))
+        add("</b>")
+    }
+    addCursive(string.substring(lastIndex))
+}
+
+private val cursiveBorders = Regex("\\*\\S(.+\\S)?\\*")
+
+private fun MutableList<String>.addCursive(string: String) {
+    var lastIndex = 0
+    for (text in cursiveBorders.findAll(string)) {
+        add(string.substring(lastIndex, text.range.start - 1))
+        lastIndex = text.range.last + 1
+        add("<i>")
+        add(string.substring(text.range.start + 1, text.range.last - 1))
+        add("</i>")
+    }
+    add(string.substring(lastIndex))
+}
+
+private fun Paragraph.applyFontModifiers(): Paragraph {
+    var isCanceled = false
+    val list = mutableListOf<String>()
+    list.addCanceled(this)
+    return list.joinToString(separator = "")
 }
 
 /**
@@ -317,6 +477,16 @@ Suspendisse ~~et elit in enim tempus iaculis~~.
  */
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
     TODO()
+    /*
+    val htmlDoc = beginHtmlBody(outputName)
+
+    val paragraphs = splitParagraphsFromFile(inputName)
+    for (paragraph in paragraphs) {
+        htmlDoc.addParagraph(paragraph.applyFontModifiers())
+    }
+
+    htmlDoc.endHtmlBody()
+    */
 }
 
 /**

@@ -237,6 +237,7 @@ fun kingTrajectory(start: Square, end: Square): List<Square> {
             result.add(Square(column, row))
             forward--
         }
+    println(result)
     return result
 }
 

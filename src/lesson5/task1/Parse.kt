@@ -137,7 +137,7 @@ fun flattenPhoneNumber(phone: String): String =
         //phone.replace(" ", "").replace("-", "")
     else ""
 
-private val bestLongJump_regex = Regex("^(\\d+|-|%)( (\\d+|-|%))*$")
+private val bestLongJump_regex = Regex("^(\\d+|-|%)( +(\\d+|-|%))*$")
 private val bestLongJump_regex_nums = Regex("\\d+")
 
 /**
@@ -236,9 +236,18 @@ fun firstDuplicateIndex(str: String): Int {
     return -1
 }
 
+/*
+    Я подумал, что название состоит из слов, а не из случаёных символов.
+
 private val mostExpensive_regex = Regex("^(([а-я]|[А-Я]|Ё|ё|\\w)+ \\d+\\.\\d; )*(([а-я]|[А-Я]|Ё|ё|\\w)+ \\d+\\.\\d)$")
 private val mostExpensive_each = Regex("([а-я]|[А-Я]|Ё|ё|\\w)+ \\d+\\.\\d")
 private val mostExpensive_product = Regex("([а-я]|[А-Я]|Ё|ё|\\w)+")
+private val mostExpensive_price = Regex("\\d+\\.\\d")
+*/
+
+private val mostExpensive_regex = Regex("^((\\S)+ \\d+\\.\\d; )*((\\S)+ \\d+\\.\\d)$")
+private val mostExpensive_each = Regex("(\\S)+ \\d+\\.\\d")
+private val mostExpensive_product = Regex("(\\S)+")
 private val mostExpensive_price = Regex("\\d+\\.\\d")
 
 /**
@@ -281,8 +290,10 @@ private val fromRoman_regex = Regex("^M*(CM)?((DC{0,3})|(CD)|C{1,3})?(XC|LX{0,3}
  * Вернуть -1, если roman не является корректным римским числом
  */
 fun fromRoman(roman: String): Int {
-    if (!(roman matches fromRoman_regex))
-        return -1
+    when {
+        roman.isBlank() -> 0
+        !(roman matches fromRoman_regex) -> -1
+    }
     var result = 0
     var index = 0
     var correct = false
