@@ -202,7 +202,7 @@ fun kingTrajectory(start: Square, end: Square): List<Square> {
     require(start.inside() && end.inside())
 
     val delta_column = end.column - start.column
-    val delta_row = Math.abs(end.row - start.row)
+    val delta_row = end.row - start.row
 
     val sign_column = delta_column > 0
     val sign_row = delta_row > 0
@@ -237,7 +237,6 @@ fun kingTrajectory(start: Square, end: Square): List<Square> {
             result.add(Square(column, row))
             forward--
         }
-    println(result)
     return result
 }
 
