@@ -203,7 +203,7 @@ fun alignFileByWidth(inputName: String, outputName: String) {
     output_stream.close()
 }
 
-private val just_words = Regex("([а-я]|[А-Я]|\\w)+")
+private val just_words = Regex("([а-яё]|[А-ЯЁ]|[a-z]|[A-Z])+")
 
 /**
  * Средняя
@@ -231,14 +231,13 @@ fun top20Words(inputName: String): Map<String, Int> {
             result[value] = 1
     }
 
-    val sorted = result.toSortedMap(Comparator {
+    val sorted = result.toList(). sortedWith(Comparator {
         a, b ->
-        if (b == "с" || a == "с") println("$a=${result[a]} ? $b=${result[b]}")
-        result[b]!!.compareTo(result[a]!!)
+        b.second.compareTo(a.second)
     })
+    result.clear()
 
-    val keys = sorted.keys
-    return sorted.headMap(if (keys.size > 20) keys.elementAt(20) else keys.elementAt(keys.size - 1))
+    return sorted.subList(0, if (sorted.size > 20) 20 else sorted.size).toMap()
 }
 
 /**
