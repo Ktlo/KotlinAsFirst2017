@@ -309,7 +309,6 @@ enum class RomanDigits (val number : Int) {
 fun roman(n: Int): String {
     val list = mutableListOf<RomanDigits>()
     var number = n
-    //print(RomanDigits.values().toList())
     for (roman_digit in RomanDigits.values()) {
         while (number - roman_digit.number >= 0) {
             list.add(roman_digit)

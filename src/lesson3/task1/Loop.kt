@@ -78,16 +78,15 @@ fun digitNumber(n: Int): Int {
 * Найти число Фибоначчи из ряда 1, 1, 2, 3, 5, 8, 13, 21, ... с номером n.
 * Ряд Фибоначчи определён следующим образом: fib(1) = 1, fib(2) = 1, fib(n+2) = fib(n) + fib(n+1)
 */
-
 fun fib(n: Int): Int {
-//tailrec fun tailfib(n : Int) : Int = if (n < 3) 1 else tailfib(n - 1) + tailfib(n -2)
-var a = 0; var b =1
-for (i in 1..n) {
-    val c = a
-    a = b
-    b += c
-}
-return a
+    var a = 0
+    var b = 1
+    for (i in 1..n) {
+        val c = a
+        a = b
+        b += c
+    }
+    return a
 }
 
 /**
@@ -97,15 +96,16 @@ return a
 * минимальное число k, которое делится и на m и на n без остатка
 */
 fun lcm(m: Int, n: Int): Int {
-fun smallestDiv(m: Int, n: Int): Int {
-    var M = m; var N = n
-    while (M * N > 0) {
-        if (M > N) M -= N
-        else N -= M
+    fun smallestDiv(m: Int, n: Int): Int {
+        var M = m
+        var N = n
+        while (M * N > 0) {
+            if (M > N) M -= N
+            else N -= M
+        }
+        return Math.max(M, N)
     }
-    return Math.max(M, N)
-}
-return m * n / smallestDiv(m, n)
+    return m * n / smallestDiv(m, n)
 }
 
 /**
@@ -114,11 +114,11 @@ return m * n / smallestDiv(m, n)
 * Для заданного числа n > 1 найти минимальный делитель, превышающий 1
 */
 fun minDivisor(n: Int): Int {
-for (i in 2..n) {
-    if (n % i == 0)
-        return i
-}
-return n
+    for (i in 2..n) {
+        if (n % i == 0)
+            return i
+    }
+    return n
 }
 
 /**
@@ -127,13 +127,13 @@ return n
 * Для заданного числа n > 1 найти максимальный делитель, меньший n
 */
 fun maxDivisor(n: Int): Int {
-var i = n
-while (i > 0) {
-    i--
-    if (n % i == 0)
-        return i
-}
-return Int.MAX_VALUE
+    var i = n
+    while (i > 0) {
+        i--
+        if (n % i == 0)
+            return i
+    }
+    return Int.MAX_VALUE
 }
 
 /**
@@ -144,15 +144,16 @@ return Int.MAX_VALUE
 * Например, 25 и 49 взаимно простые, а 6 и 8 -- нет.
 */
 fun isCoPrime(m: Int, n: Int): Boolean {
-fun smallestDiv(m: Long, n: Long): Int {
-    var M = m; var N = n
-    while (M * N > 0) {
-        if (M > N) M -= N
-        else N -= M
+    fun smallestDiv(m: Long, n: Long): Int {
+        var M = m
+        var N = n
+        while (M * N > 0) {
+            if (M > N) M -= N
+            else N -= M
+        }
+        return Math.max(M.toInt(), N.toInt())
     }
-    return Math.max(M.toInt(), N.toInt())
-}
-return smallestDiv(m.toLong(), n.toLong()) == 1
+    return smallestDiv(m.toLong(), n.toLong()) == 1
 }
 
 /**
@@ -165,11 +166,11 @@ return smallestDiv(m.toLong(), n.toLong()) == 1
 fun squareBetweenExists(m: Int, n: Int): Boolean = sqr(Math.ceil(Math.sqrt(m.toDouble()))) <= n
 
 fun sameAngle(x: Double) : Double {
-val multiplier = Math.floor(x / Math.PI).toInt()
-return if (multiplier % 2 == 0)
-    +(x - multiplier * Math.PI)
-else
-    -(x - multiplier * Math.PI)
+    val multiplier = Math.floor(x / Math.PI).toInt()
+    return if (multiplier % 2 == 0)
+        +(x - multiplier * Math.PI)
+    else
+        -(x - multiplier * Math.PI)
 }
 
 /**
@@ -187,7 +188,6 @@ fun sin(x: Double, eps: Double): Double {
     var divider = 1.0
     var numerator = 1.0
     var sum = 0.0
-    //println("sin(${x * 180 / Math.PI}') = sin(${X * 180 / Math.PI}')")
     do {
         i++
         divider *= i
@@ -198,9 +198,7 @@ fun sin(x: Double, eps: Double): Double {
             +next
         else
             -next
-        //println("$sum|$next=$numerator/$divider:$i")
     } while (Math.abs(next) > eps)
-    //println("answer = $sum")
     return sum
 }
 
@@ -219,7 +217,6 @@ fun cos(x: Double, eps: Double): Double {
     var divider = 1.0
     var numerator = 1.0
     var sum = 1.0
-    //println("cos(${x * 180 / Math.PI}') = cos(${X * 180 / Math.PI}')")
     do {
         i++
         divider *= i
@@ -230,9 +227,7 @@ fun cos(x: Double, eps: Double): Double {
             +next
         else
             -next
-        //println("$sum|$next=$numerator/$divider:$i")
     } while (Math.abs(next) > eps)
-    //println("answer = $sum")
     return sum
 }
 
@@ -243,13 +238,13 @@ fun cos(x: Double, eps: Double): Double {
 * Не использовать строки при решении задачи.
 */
 fun revert(n: Int): Int {
-var input = n
-var output = 0
-while (input > 0) {
-    output = output * 10 + input % 10
-    input /= 10
-}
-return output
+    var input = n
+    var output = 0
+    while (input > 0) {
+        output = output * 10 + input % 10
+        input /= 10
+    }
+    return output
 }
 
 /**
@@ -268,16 +263,17 @@ fun isPalindrome(n: Int): Boolean = revert(n) == n
 * Например, 54 и 323 состоят из разных цифр, а 111 и 0 из одинаковых.
 */
 fun hasDifferentDigits(n: Int): Boolean {
-val digit = n % 10
-var input = n / 10
-while (input > 0) {
-    if (input % 10 != digit)
-        return true
-    input /= 10
-}
-return false
+    val digit = n % 10
+    var input = n / 10
+    while (input > 0) {
+        if (input % 10 != digit)
+            return true
+        input /= 10
+    }
+    return false
 }
 
+@Deprecated("Use digitNumber(Int) instead.", ReplaceWith("digitNumber(n)"))
 private fun digitNumberLog(n: Int) =
         if (n == 0) 1 else Math.ceil(Math.log10((n + 1).toDouble())).toInt()
 
@@ -288,6 +284,18 @@ private fun getDigit(n: Int, i: Int) : Int {
     return n / divider % 10
 }
 
+// higherOrderFunction
+private fun sequenceDigit(n: Int, getElement: (i: Int) -> Int): Int {
+    var enumerator = 2
+    var i = 1
+    var last = 1
+    while (i < n) {
+        last = getElement(enumerator++)
+        i += digitNumber(last)
+    }
+    return getDigit(last, i - n)
+}
+
 /**
 * Сложная
 *
@@ -295,15 +303,7 @@ private fun getDigit(n: Int, i: Int) : Int {
 * 149162536496481100121144...
 * Например, 2-я цифра равна 4, 7-я 5, 12-я 6.
 */
-fun squareSequenceDigit(n: Int): Int {
-    var i = 1
-    var sq = 1
-    while (i < n) {
-        sq++
-        i += digitNumberLog(sq * sq)
-    }
-    return getDigit(sq * sq, i - n)
-}
+fun squareSequenceDigit(n: Int): Int = sequenceDigit(n) { it * it }
 
 /**
 * Сложная
@@ -315,12 +315,14 @@ fun squareSequenceDigit(n: Int): Int {
 fun fibSequenceDigit(n: Int): Int {
     var a = 0
     var b = 1
-    var i = 1
-    while (i < n) {
-        val c = a
+
+    val r = sequenceDigit(n) {
+        val c = a + b
         a = b
-        b += c
-        i += digitNumberLog(b)
+        b = c
+        print(c)
+        c
     }
-    return getDigit(b, i - n)
+    println()
+    return r
 }

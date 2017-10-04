@@ -137,7 +137,28 @@ fun flattenPhoneNumber(phone: String): String =
         //phone.replace(" ", "").replace("-", "")
     else ""
 
-private val bestLongJump_regex = Regex("^(\\d+|-|%)( +(\\d+|-|%))*$")
+// Регулярное выражение не выдерживает агрессивно большого текста :(
+// private val bestLongJump_regex = Regex("^(\\d+|-|%)(\\s+(\\d+|-|%))*$")
+// Вместо будет нерекурсивная функция
+private fun bestLongJump_assert(string: String): Boolean {
+    if (string.isEmpty())
+        return false
+    if (string.first() == ' ' || string.last() == ' ')
+        return false
+    var last = ' '
+    for (character in string) {
+        when (character) {
+            in '0'..'9' -> if (last != ' ' && last !in '0'..'9') return false
+            '-' -> if (last != ' ') return false
+            '%' -> if (last != ' ') return false
+            ' ' -> {}
+            else -> return false
+        }
+        last = character
+    }
+    return true
+}
+
 private val bestLongJump_regex_nums = Regex("\\d+")
 
 /**
@@ -151,8 +172,9 @@ private val bestLongJump_regex_nums = Regex("\\d+")
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
 fun bestLongJump(jumps: String): Int {
+
     var max_jump = -1
-    if (jumps matches bestLongJump_regex)
+    if (bestLongJump_assert(jumps))
         for (num in bestLongJump_regex_nums.findAll(jumps)) {
             val curr = num.value.toInt()
             if (curr > max_jump)
@@ -161,7 +183,7 @@ fun bestLongJump(jumps: String): Int {
     return max_jump
 }
 
-private val assertJumps = Regex("(\\d+ [+\\-%]+ )*\\d+ [+\\-%]+")
+private val assertJumps  = Regex("^(\\d+ [+\\-%]+ )*\\d+ [+\\-%]+$")
 private val findAllJumps = Regex("\\d+ [\\-%]*\\+")
 private val height_regex = Regex("\\d+")
 /**
@@ -175,7 +197,7 @@ private val height_regex = Regex("\\d+")
  * При нарушении формата входной строки вернуть -1.
  */
 fun bestHighJump(jumps: String): Int {
-    if (!(jumps matches assertJumps))
+    if (!(jumps matches assertJumps && '+' in jumps))
         return -1
     var most_high = 0
     for (jump in findAllJumps.findAll(jumps)) {
@@ -245,10 +267,10 @@ private val mostExpensive_product = Regex("([а-я]|[А-Я]|Ё|ё|\\w)+")
 private val mostExpensive_price = Regex("\\d+\\.\\d")
 */
 
-private val mostExpensive_regex = Regex("^((\\S)+ \\d+\\.\\d; )*((\\S)+ \\d+\\.\\d)$")
-private val mostExpensive_each = Regex("(\\S)+ \\d+\\.\\d")
+private val mostExpensive_regex = Regex("^((\\S)+ \\d+\\.\\d+; )*((\\S)+ \\d+\\.\\d+)$")
+private val mostExpensive_each = Regex("(\\S)+ \\d+\\.\\d+")
 private val mostExpensive_product = Regex("(\\S)+")
-private val mostExpensive_price = Regex("\\d+\\.\\d")
+private val mostExpensive_price = Regex("\\d+\\.\\d+")
 
 /**
  * Сложная
@@ -291,8 +313,8 @@ private val fromRoman_regex = Regex("^M*(CM)?((DC{0,3})|(CD)|C{1,3})?(XC|LX{0,3}
  */
 fun fromRoman(roman: String): Int {
     when {
-        roman.isBlank() -> 0
-        !(roman matches fromRoman_regex) -> -1
+        roman.isBlank() -> return 0
+        !(roman matches fromRoman_regex) -> return -1
     }
     var result = 0
     var index = 0

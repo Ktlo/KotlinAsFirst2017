@@ -1,7 +1,6 @@
 @file:Suppress("UNUSED_PARAMETER")
 package lesson8.task1
 
-import java.io.BufferedOutputStream
 import java.io.BufferedWriter
 import java.io.File
 import java.util.*
@@ -353,7 +352,6 @@ fun chooseLongestChaoticWord(inputName: String, outputName: String) {
 }
 
 typealias HTML = BufferedWriter
-typealias Paragraph = String
 
 private fun beginHtmlBody(filename: String): HTML {
     val output = File(filename).bufferedWriter()
@@ -366,69 +364,92 @@ private fun HTML.endHtmlBody() {
     close()
 }
 
-private fun HTML.addParagraph(paragraph: Paragraph) {
+private fun HTML.beginParagraph() {
     write("\t\t<p>\n")
-    for (line in paragraph.lines()) {
-        write("\t\t\t$line\n")
-    }
+}
+
+private fun HTML.endParagraph() {
     write("\t\t</p>\n")
 }
 
-private fun splitParagraphsFromFile(filename: String): MutableList<Paragraph> {
-    val result = mutableListOf<String>()
-    for (line in File(filename).readText().split("\n\n")) {
-        if (line.isNotBlank())
-            result.add(line)
-    }
-    return result
+typealias Paragraph = String
+
+private fun HTML.writeParagraph(paragraph: Paragraph) {
+    for (line in paragraph.lines())
+        write("\t\t\t$line\n")
 }
 
-private fun MutableList<String>.addCanceled(string: Paragraph) {
+private fun String.splitParagraphs() : List<Paragraph> = this.split(Regex("\n\\s*\n"))
+
+private fun StringBuilder.change(regex: Regex, changer: (MatchResult) -> String) {
+    while (true) {
+        val matchResult = regex.find(this) ?: break
+        val range = matchResult.range
+        this.replace(range.start, range.last + 1, changer(matchResult))
+    }
+}
+
+private fun Paragraph.setFontModifiers(): Paragraph {
+    var isCursive = true
+    var isBold = true
     var isCanceled = false
-    for (text in string.split("~~")) {
-        if (isCanceled)
-            add("<s>")
-        addBold(text)
-        if (isCanceled)
-            add("</s>")
-        isCanceled = !isCanceled
+
+    val text = StringBuilder(this)
+    text.change(Regex("""\*\*\*""")) {
+        if (isBold) {
+            isBold = false
+            if (isCursive) {
+                isCursive = false
+                "</b></i>"
+            }
+            else {
+                isCursive = true
+                "<i></b>"
+            }
+        }
+        else {
+            isBold = true
+            if (isCursive) {
+                isCursive = false
+                "</i><b>"
+            }
+            else {
+                isCursive = true
+                "<b><i>"
+            }
+        }
     }
-
-}
-
-private val boldBorders = Regex("\\*\\*\\S(.+\\S)?\\*?\\*\\*")
-
-private fun MutableList<String>.addBold(string: String) {
-    var lastIndex = 0
-    for (text in boldBorders.findAll(string)) {
-        addCursive(string.substring(lastIndex, text.range.start - 1))
-        lastIndex = text.range.last + 1
-        add("<b>")
-        addCursive(string.substring(text.range.start + 2, text.range.last - 2))
-        add("</b>")
+    text.change(Regex("""\*\*""")) {
+        if (isBold) {
+            isBold = false
+            "</b>"
+        }
+        else {
+            isBold = true
+            "<b>"
+        }
     }
-    addCursive(string.substring(lastIndex))
-}
-
-private val cursiveBorders = Regex("\\*\\S(.+\\S)?\\*")
-
-private fun MutableList<String>.addCursive(string: String) {
-    var lastIndex = 0
-    for (text in cursiveBorders.findAll(string)) {
-        add(string.substring(lastIndex, text.range.start - 1))
-        lastIndex = text.range.last + 1
-        add("<i>")
-        add(string.substring(text.range.start + 1, text.range.last - 1))
-        add("</i>")
+    text.change(Regex("""\*""")) {
+        if (isCursive) {
+            isCursive = false
+            "</i>"
+        }
+        else {
+            isCursive = true
+            "<i>"
+        }
     }
-    add(string.substring(lastIndex))
-}
-
-private fun Paragraph.applyFontModifiers(): Paragraph {
-    var isCanceled = false
-    val list = mutableListOf<String>()
-    list.addCanceled(this)
-    return list.joinToString(separator = "")
+    text.change(Regex("""~~""")) {
+        if (isCanceled) {
+            isCanceled = false
+            "</s>"
+        }
+        else {
+            isCanceled = true
+            "<s>"
+        }
+    }
+    return text.toString()
 }
 
 /**
@@ -475,18 +496,25 @@ Suspendisse ~~et elit in enim tempus iaculis~~.
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    TODO()
-    /*
     val htmlDoc = beginHtmlBody(outputName)
 
-    val paragraphs = splitParagraphsFromFile(inputName)
+    val paragraphs = File(inputName).readText().splitParagraphs()
+
     for (paragraph in paragraphs) {
-        htmlDoc.addParagraph(paragraph.applyFontModifiers())
+        htmlDoc.beginParagraph()
+        htmlDoc.writeParagraph(paragraph.setFontModifiers())
+        htmlDoc.endParagraph()
     }
 
     htmlDoc.endHtmlBody()
-    */
 }
+
+/*
+private fun Paragraph.makeLists(): Paragraph {
+    //val lines = List()
+    return ""
+}
+*/
 
 /**
  * Сложная
@@ -583,6 +611,17 @@ fun markdownToHtmlSimple(inputName: String, outputName: String) {
  */
 fun markdownToHtmlLists(inputName: String, outputName: String) {
     TODO()
+    /*
+    val htmlDoc = beginHtmlBody(outputName)
+
+    for (paragraph in File(inputName).readText().splitParagraphs()) {
+        htmlDoc.beginParagraph()
+        //htmlDoc.writeParagraph()
+        htmlDoc.endParagraph()
+    }
+
+    htmlDoc.endHtmlBody()
+    */
 }
 
 /**
