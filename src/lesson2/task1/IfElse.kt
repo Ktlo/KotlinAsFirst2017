@@ -57,12 +57,12 @@ fun timeForHalfWay(t1: Double, v1: Double,
     val s2 = v2 * t2
     val s3 = v3 * t3
 
-    val s_half = (s1 + s2 + s3) / 2
+    val sHalf = (s1 + s2 + s3) / 2
 
     return when {
-        s_half <= s1 -> s_half / v1
-        s_half <= s2 + s1 -> t1 + (s_half - s1) / v2
-        else -> t1 + t2 + (s_half - s1 - s2) / v3
+        sHalf <= s1 -> sHalf / v1
+        sHalf <= s2 + s1 -> t1 + (sHalf - s1) / v2
+        else -> t1 + t2 + (sHalf - s1 - s2) / v3
     }
 }
 
@@ -121,10 +121,10 @@ fun triangleKind(a: Double, b: Double, c: Double): Int {
         -1
     else {
         val hyp = sqr(A) + sqr(B)
-        val ideal_hyp = sqr(C)
+        val idealHyp = sqr(C)
         when {
-            hyp > ideal_hyp -> 0
-            hyp == ideal_hyp -> 1
+            hyp > idealHyp -> 0
+            hyp == idealHyp -> 1
             else -> 2
         }
     }

@@ -51,8 +51,8 @@ fun circleInside(x1: Double, y1: Double, r1: Double,
  * Вернуть true, если кирпич пройдёт
  */
 fun brickPasses(a: Int, b: Int, c: Int, r: Int, s: Int): Boolean {
-    val (A, B) = intArrayOf(a, b, c).apply { sort() }
+    val (minA, minB) = intArrayOf(a, b, c).apply { sort() }
     val R = Math.min(r, s)
     val S = Math.max(r, s)
-    return B <= S && A <= R
+    return minB <= S && minA <= R
 }

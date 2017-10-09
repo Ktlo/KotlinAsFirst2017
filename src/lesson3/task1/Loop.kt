@@ -97,13 +97,13 @@ fun fib(n: Int): Int {
 */
 fun lcm(m: Int, n: Int): Int {
     fun smallestDiv(m: Int, n: Int): Int {
-        var M = m
-        var N = n
-        while (M * N > 0) {
-            if (M > N) M -= N
-            else N -= M
+        var mutableM = m
+        var mutableN = n
+        while (mutableM * mutableN > 0) {
+            if (mutableM > mutableN) mutableM -= mutableN
+            else mutableN -= mutableM
         }
-        return Math.max(M, N)
+        return Math.max(mutableM, mutableN)
     }
     return m * n / smallestDiv(m, n)
 }

@@ -69,7 +69,7 @@ private val months = mapOf(
         "октября" to Month("10", 31), "ноября" to Month("11", 29), "декабря" to Month("12", 31)
 )
 
-private val dateStrToDigit_regex = Regex("^\\d{1,2} [а-я]{3,} \\d+$")
+private val dateStrToDigitRegex = Regex("^\\d{1,2} [а-я]{3,} \\d+$")
 
 /**
  * Средняя
@@ -80,7 +80,7 @@ private val dateStrToDigit_regex = Regex("^\\d{1,2} [а-я]{3,} \\d+$")
  * При неверном формате входной строки вернуть пустую строку
  */
 fun dateStrToDigit(str: String): String {
-    if (!(str matches dateStrToDigit_regex))
+    if (!(str matches dateStrToDigitRegex))
         return ""
     val (data_num, month, year) = str.split(' ')
     return if (months.containsKey(month) && data_num.toInt() in 1..months[month]!!.maxData)
@@ -89,13 +89,13 @@ fun dateStrToDigit(str: String): String {
         ""
 }
 
-private val month_array = months.values.toTypedArray()
-private val month_names = arrayOf("января", "февраля", "марта",
+private val monthArray = months.values.toTypedArray()
+private val monthNames = arrayOf("января", "февраля", "марта",
                                 "апреля", "мая", "июня",
                                 "июля", "августа", "сентября",
                                 "октября", "ноября", "декабря")
 
-private val dateDigitToStr_regex = Regex("^\\d{2}\\.\\d{2}\\.\\d+$")
+private val dateDigitToStrRegex = Regex("^\\d{2}\\.\\d{2}\\.\\d+$")
 
 /**
  * Средняя
@@ -105,19 +105,19 @@ private val dateDigitToStr_regex = Regex("^\\d{2}\\.\\d{2}\\.\\d+$")
  * При неверном формате входной строки вернуть пустую строку
  */
 fun dateDigitToStr(digital: String): String {
-    if (!(digital matches dateDigitToStr_regex))
+    if (!(digital matches dateDigitToStrRegex))
         return ""
     val (data_num, month, year) = digital.split('.')
     val m = month.toInt() - 1
     val d = data_num.toInt()
-    return if (m in 0..11 && d in 1..month_array[m].maxData)
-        "$d ${month_names[m]} ${year.toInt()}"
+    return if (m in 0..11 && d in 1..monthArray[m].maxData)
+        "$d ${monthNames[m]} ${year.toInt()}"
     else ""
 }
 
-private val telephone_regex = Regex("^\\s*(\\+\\d+)?[\\s\\-]*(\\(\\d+\\))?([\\s\\-]*\\d)+\\s*$")
+private val telephoneRegex = Regex("^\\s*(\\+\\d+)?[\\s\\-]*(\\(\\d+\\))?([\\s\\-]*\\d)+\\s*$")
 
-private val telephone_regex_replace = Regex("[\\Q-() \\E]")
+private val telephoneRegexReplace = Regex("[\\Q-() \\E]")
 
 /**
  * Средняя
@@ -132,8 +132,8 @@ private val telephone_regex_replace = Regex("[\\Q-() \\E]")
  * При неверном формате вернуть пустую строку
  */
 fun flattenPhoneNumber(phone: String): String =
-    if (phone matches telephone_regex)
-        phone.replace(telephone_regex_replace, "")
+    if (phone matches telephoneRegex)
+        phone.replace(telephoneRegexReplace, "")
         //phone.replace(" ", "").replace("-", "")
     else ""
 
@@ -159,7 +159,7 @@ private fun bestLongJump_assert(string: String): Boolean {
     return true
 }
 
-private val bestLongJump_regex_nums = Regex("\\d+")
+private val bestLongJumpRegexNumbers = Regex("\\d+")
 
 /**
  * Средняя
@@ -175,7 +175,7 @@ fun bestLongJump(jumps: String): Int {
 
     var max_jump = -1
     if (bestLongJump_assert(jumps))
-        for (num in bestLongJump_regex_nums.findAll(jumps)) {
+        for (num in bestLongJumpRegexNumbers.findAll(jumps)) {
             val curr = num.value.toInt()
             if (curr > max_jump)
                 max_jump = curr
@@ -183,9 +183,6 @@ fun bestLongJump(jumps: String): Int {
     return max_jump
 }
 
-private val assertJumps  = Regex("^(\\d+ [+\\-%]+ )*\\d+ [+\\-%]+$")
-private val findAllJumps = Regex("\\d+ [\\-%]*\\+")
-private val height_regex = Regex("\\d+")
 /**
  * Сложная
  *
@@ -197,19 +194,33 @@ private val height_regex = Regex("\\d+")
  * При нарушении формата входной строки вернуть -1.
  */
 fun bestHighJump(jumps: String): Int {
-    if (!(jumps matches assertJumps && '+' in jumps))
-        return -1
-    var most_high = 0
-    for (jump in findAllJumps.findAll(jumps)) {
-        val curr_jump = height_regex.find(jump.value)!!.value.toInt()
-        if (curr_jump > most_high)
-            most_high = curr_jump
+    var isNum = true
+    var max = -1
+    var curr = 0
+    for (string in jumps.split(' ')) {
+        if (isNum) {
+            if (string matches Regex("\\d+"))
+                curr = string.toInt()
+            else
+                return -1
+        }
+        else {
+            if (string matches Regex("[-+%]+")) {
+                if ('+' in string) {
+                    if (curr > max)
+                        max = curr
+                }
+            }
+            else
+                return -1
+        }
+        isNum = !isNum
     }
-    return most_high
+    return max
 }
 
-private val plusMinus_assert_regex = Regex("\\d+( [+\\-] \\d+)*")
-private val plusMinus_number = Regex("\\d+")
+private val plusMinusAssertRegex = Regex("\\d+( [+\\-] \\d+)*")
+private val plusMinusNumber = Regex("\\d+")
 /**
  * Сложная
  *
@@ -222,10 +233,10 @@ private val plusMinus_number = Regex("\\d+")
 fun plusMinus(expression: String): Int {
     var summ = 0
     var sign = true
-    require(expression matches plusMinus_assert_regex)
+    require(expression matches plusMinusAssertRegex)
     for (one in expression.split(' ')) {
         when {
-            one matches plusMinus_number -> summ += if (sign) one.toInt() else -one.toInt()
+            one matches plusMinusNumber -> summ += if (sign) one.toInt() else -one.toInt()
             one == "+" -> sign = true
             else -> sign = false
         }
@@ -233,7 +244,7 @@ fun plusMinus(expression: String): Int {
     return summ
 }
 
-private val firstDuplicateIndex_word_regex = Regex("\\S+")
+private val firstDuplicateIndexWordRegex = Regex("\\S+")
 
 /**
  * Сложная
@@ -245,14 +256,14 @@ private val firstDuplicateIndex_word_regex = Regex("\\S+")
  * Пример: "Он пошёл в в школу" => результат 9 (индекс первого 'в')
  */
 fun firstDuplicateIndex(str: String): Int {
-    var last_word = ""
-    var last_index = -1
-    for (word in firstDuplicateIndex_word_regex.findAll(str)) {
-        if (word.value.compareTo(last_word, ignoreCase = true) == 0)
-            return last_index
+    var lastWord = ""
+    var lastIndex = -1
+    for (word in firstDuplicateIndexWordRegex.findAll(str)) {
+        if (word.value.compareTo(lastWord, ignoreCase = true) == 0)
+            return lastIndex
         else {
-            last_word = word.value
-            last_index = word.range.start
+            lastWord = word.value
+            lastIndex = word.range.start
         }
     }
     return -1
@@ -261,16 +272,16 @@ fun firstDuplicateIndex(str: String): Int {
 /*
     Я подумал, что название состоит из слов, а не из случаёных символов.
 
-private val mostExpensive_regex = Regex("^(([а-я]|[А-Я]|Ё|ё|\\w)+ \\d+\\.\\d; )*(([а-я]|[А-Я]|Ё|ё|\\w)+ \\d+\\.\\d)$")
-private val mostExpensive_each = Regex("([а-я]|[А-Я]|Ё|ё|\\w)+ \\d+\\.\\d")
-private val mostExpensive_product = Regex("([а-я]|[А-Я]|Ё|ё|\\w)+")
-private val mostExpensive_price = Regex("\\d+\\.\\d")
+private val mostExpensiveRegex = Regex("^(([а-я]|[А-Я]|Ё|ё|\\w)+ \\d+\\.\\d; )*(([а-я]|[А-Я]|Ё|ё|\\w)+ \\d+\\.\\d)$")
+private val mostExpensiveEach = Regex("([а-я]|[А-Я]|Ё|ё|\\w)+ \\d+\\.\\d")
+private val mostExpensiveProduct = Regex("([а-я]|[А-Я]|Ё|ё|\\w)+")
+private val mostExpensivePrice = Regex("\\d+\\.\\d")
 */
 
-private val mostExpensive_regex = Regex("^((\\S)+ \\d+\\.\\d+; )*((\\S)+ \\d+\\.\\d+)$")
-private val mostExpensive_each = Regex("(\\S)+ \\d+\\.\\d+")
-private val mostExpensive_product = Regex("(\\S)+")
-private val mostExpensive_price = Regex("\\d+\\.\\d+")
+private val mostExpensiveRegex = Regex("^(\\S+ \\d+(\\.\\d+)?; )*(\\S+ \\d+(\\.\\d+)?)$")
+private val mostExpensiveEach = Regex("\\S+ \\d+(\\.\\d+)?")
+private val mostExpensiveProduct = Regex("\\S+")
+private val mostExpensivePrice = Regex("\\d+(\\.\\d+)?")
 
 /**
  * Сложная
@@ -284,21 +295,21 @@ private val mostExpensive_price = Regex("\\d+\\.\\d+")
  * Все цены должны быть положительными
  */
 fun mostExpensive(description: String): String {
-    if (!(description matches mostExpensive_regex))
+    if (!(description matches mostExpensiveRegex))
         return ""
     var max_price = .0
     var product_name = ""
-    for (each in mostExpensive_each.findAll(description)) {
-        val price = mostExpensive_price.find(each.value)!!.value.toDouble()
+    for (each in mostExpensiveEach.findAll(description)) {
+        val price = mostExpensivePrice.find(each.value)!!.value.toDouble()
         if (price > max_price) {
             max_price = price
-            product_name = mostExpensive_product.find(each.value)!!.value
+            product_name = mostExpensiveProduct.find(each.value)!!.value
         }
     }
     return product_name
 }
 
-private val fromRoman_regex = Regex("^M*(CM)?((DC{0,3})|(CD)|C{1,3})?(XC|LX{0,3}|XL|X{1,3})?(IX|VI{0,3}|IV|I{1,3})?$")
+private val fromRomanRegex = Regex("^M*(CM)?((DC{0,3})|(CD)|C{1,3})?(XC|LX{0,3}|XL|X{1,3})?(IX|VI{0,3}|IV|I{1,3})?$")
 
 /**
  * Сложная
@@ -313,8 +324,8 @@ private val fromRoman_regex = Regex("^M*(CM)?((DC{0,3})|(CD)|C{1,3})?(XC|LX{0,3}
  */
 fun fromRoman(roman: String): Int {
     when {
-        roman.isBlank() -> return 0
-        !(roman matches fromRoman_regex) -> return -1
+        roman.isBlank() -> return -1
+        !(roman matches fromRomanRegex) -> return -1
     }
     var result = 0
     var index = 0
@@ -332,18 +343,19 @@ fun fromRoman(roman: String): Int {
     return if (correct) result else -1
 }
 
-private val brainFuck_regex = Regex("^[\\Q+-<>[] \\E]*$")
+private val brainFuckRegex = Regex("^[\\Q+-<>[] \\E]*$")
 
 private fun requireBrainFuck(commands: String) {
-    require(commands matches brainFuck_regex)
+    require(commands matches brainFuckRegex) { "Unpaired closing bracket" }
     var braces = 0
     for (i in 0 until commands.length) {
         when (commands[i]) {
             '[' -> braces++
             ']' -> braces--
         }
+        require(braces >= 0) { "Unpaired closing bracket" }
     }
-    require(braces == 0)
+    require(braces == 0) { "Unpaired closing bracket" }
 }
 
 private fun braceEnds(commands: String, offset: Int): Int {
@@ -359,7 +371,7 @@ private fun braceEnds(commands: String, offset: Int): Int {
     return ptr
 }
 
-private fun braceBegin(commands: String, offset: Int): Int {
+private fun braceBegins(commands: String, offset: Int): Int {
     var braces = 1
     var ptr = offset
     while (braces > 0) {
@@ -409,6 +421,9 @@ private fun braceBegin(commands: String, offset: Int): Int {
  *
  */
 fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
+    /*
+     *  Имплементация изотерического языка программирования "BrainFuck" (без операндов "." и ",")
+     */
     requireBrainFuck(commands)
     val list = MutableList(cells) {0}
     var counter = limit
@@ -433,7 +448,7 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
                 cmd_ptr = braceEnds(commands, cmd_ptr)
             }
             ']' -> if (list[list_ptr] != 0) {
-                cmd_ptr = braceBegin(commands, cmd_ptr)
+                cmd_ptr = braceBegins(commands, cmd_ptr)
             }
         }
         cmd_ptr++
