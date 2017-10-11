@@ -89,24 +89,23 @@ fun fib(n: Int): Int {
     return a
 }
 
+fun smallestDiv(m: Long, n: Long): Long {
+    var mutableM = m
+    var mutableN = n
+    while (mutableM * mutableN > 0) {
+        if (mutableM > mutableN) mutableM -= mutableN
+        else mutableN -= mutableM
+    }
+    return Math.max(mutableM, mutableN)
+}
+
 /**
 * Простая
 *
 * Для заданных чисел m и n найти наименьшее общее кратное, то есть,
 * минимальное число k, которое делится и на m и на n без остатка
 */
-fun lcm(m: Int, n: Int): Int {
-    fun smallestDiv(m: Int, n: Int): Int {
-        var mutableM = m
-        var mutableN = n
-        while (mutableM * mutableN > 0) {
-            if (mutableM > mutableN) mutableM -= mutableN
-            else mutableN -= mutableM
-        }
-        return Math.max(mutableM, mutableN)
-    }
-    return m * n / smallestDiv(m, n)
-}
+fun lcm(m: Int, n: Int): Int = m * n / smallestDiv(m.toLong(), n.toLong()).toInt()
 
 /**
 * Простая
@@ -143,18 +142,7 @@ fun maxDivisor(n: Int): Int {
 * Взаимно простые числа не имеют общих делителей, кроме 1.
 * Например, 25 и 49 взаимно простые, а 6 и 8 -- нет.
 */
-fun isCoPrime(m: Int, n: Int): Boolean {
-    fun smallestDiv(m: Long, n: Long): Int {
-        var M = m
-        var N = n
-        while (M * N > 0) {
-            if (M > N) M -= N
-            else N -= M
-        }
-        return Math.max(M.toInt(), N.toInt())
-    }
-    return smallestDiv(m.toLong(), n.toLong()) == 1
-}
+fun isCoPrime(m: Int, n: Int): Boolean = smallestDiv(m.toLong(), n.toLong()) == 1L
 
 /**
 * Простая
@@ -312,17 +300,4 @@ fun squareSequenceDigit(n: Int): Int = sequenceDigit(n) { it * it }
 * 1123581321345589144...
 * Например, 2-я цифра равна 1, 9-я 2, 14-я 5.
 */
-fun fibSequenceDigit(n: Int): Int {
-    var a = 0
-    var b = 1
-
-    val r = sequenceDigit(n) {
-        val c = a + b
-        a = b
-        b = c
-        print(c)
-        c
-    }
-    println()
-    return r
-}
+fun fibSequenceDigit(n: Int): Int = sequenceDigit(n) { fib(it) }

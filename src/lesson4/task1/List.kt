@@ -309,29 +309,29 @@ enum class RomanDigits (val number : Int) {
 fun roman(n: Int): String {
     val list = mutableListOf<RomanDigits>()
     var number = n
-    for (roman_digit in RomanDigits.values()) {
-        while (number - roman_digit.number >= 0) {
-            list.add(roman_digit)
-            number -= roman_digit.number
+    for (romanDigit in RomanDigits.values()) {
+        while (number - romanDigit.number >= 0) {
+            list.add(romanDigit)
+            number -= romanDigit.number
         }
     }
-    return list.joinToString (separator = ""){ it.name }
+    return list.joinToString (separator = "") { it.name }
 }
 
-val last = arrayOf("", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять")
-val last_thnd = arrayOf("", "одна", "две", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять")
-val dec = arrayOf("", "десять", "двадцать", "тридцать", "сорок", "пятьдесят",
+private val last = arrayOf("", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять")
+private val lastThnd = arrayOf("", "одна", "две", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять")
+private val dec = arrayOf("", "десять", "двадцать", "тридцать", "сорок", "пятьдесят",
         "шестьдесят", "семьдесят", "восемьдесят", "девяносто")
-val first_dec = arrayOf("", "одиннадцать", "двенадцать", "тринадцать", "четырнадцать", "пятнадцать",
+private val firstDec = arrayOf("", "одиннадцать", "двенадцать", "тринадцать", "четырнадцать", "пятнадцать",
         "шестнадцать", "семнадцать", "восемнадцать", "девятнадцать")
-val hund = arrayOf("", "сто", "двести", "триста", "четыреста", "пятьсот", "шестьсот", "семьсот", "восемьсот", "девятьсот")
+private val hund = arrayOf("", "сто", "двести", "триста", "четыреста", "пятьсот", "шестьсот", "семьсот", "восемьсот", "девятьсот")
 
 private fun getRussianRep(n: Int, last_digit: Array<String>) : String {
     val hundreds = hund[n / 100 % 10]
     val digit : String
     val decs = if (n % 100 in 11..19) {
         digit = ""
-        first_dec[n % 10]
+        firstDec[n % 10]
     }
     else {
         digit = last_digit[n % 10]
@@ -350,12 +350,12 @@ private fun getRussianRep(n: Int, last_digit: Array<String>) : String {
 fun russian(n: Int): String {
     val postfix = getRussianRep(n, last)
     if (n < 1000) return postfix
-    val prefix = getRussianRep(n / 1000, last_thnd)
-    val thnd_val = n / 1000 % 100
+    val prefix = getRussianRep(n / 1000, lastThnd)
+    val thndVal = n / 1000 % 100
     val thnd = when {
-        thnd_val in 11..19 -> "тысяч"
-        thnd_val % 10 == 1 -> "тысяча"
-        thnd_val % 10 in 2..4 -> "тысячи"
+        thndVal in 11..19 -> "тысяч"
+        thndVal % 10 == 1 -> "тысяча"
+        thndVal % 10 in 2..4 -> "тысячи"
         else -> "тысяч"
     }
     return "$prefix $thnd $postfix".trim()
