@@ -2,6 +2,7 @@
 package lesson5.task1
 
 import lesson4.task1.RomanDigits
+import java.util.*
 
 /**
  * Пример
@@ -60,16 +61,29 @@ fun main(args: Array<String>) {
     }
 }
 
-private class Month(val number : String, val maxData : Int)
+private val monthNames = arrayOf(
+        "января", "февраля", "марта",
+        "апреля", "мая", "июня",
+        "июля", "августа", "сентября",
+        "октября", "ноября", "декабря"
+    )
 
-private val months = mapOf(
-        "января" to Month("01", 31), "февраля" to Month("02", 29), "марта" to Month("03", 31),
-        "апреля" to Month("04", 31), "мая" to Month("05", 29), "июня" to Month("06", 31),
-        "июля" to Month("07", 31), "августа" to Month("08", 29), "сентября" to Month("09", 31),
-        "октября" to Month("10", 31), "ноября" to Month("11", 29), "декабря" to Month("12", 31)
-)
+private class Month constructor(n: Int){
+    private val num: Int = n + 1
 
-private val dateStrToDigitRegex = Regex("^\\d{1,2} [а-я]{3,} \\d+$")
+    fun days(year: Int): Int {
+        val calendar = java.util.GregorianCalendar(year, num, 1)
+        return calendar.getActualMaximum(GregorianCalendar.DAY_OF_MONTH)
+    }
+    val number = if (n < 10) "0$num" else num.toString()
+    val name = monthNames[n]
+}
+
+private val months = Array(12) { Month(it) }
+
+private val associatedMonths = months.associateBy { it.name }
+
+private val dateStrToDigitRegex = Regex("""^\d{1,2} [а-я]{3,} \d+$""")
 
 /**
  * Средняя
@@ -82,20 +96,17 @@ private val dateStrToDigitRegex = Regex("^\\d{1,2} [а-я]{3,} \\d+$")
 fun dateStrToDigit(str: String): String {
     if (!(str matches dateStrToDigitRegex))
         return ""
-    val (data_num, month, year) = str.split(' ')
-    return if (months.containsKey(month) && data_num.toInt() in 1..months[month]!!.maxData)
-        "${if (data_num.length == 1) "0"+data_num else data_num}.${months[month]!!.number}.$year"
+    val (day, month, year) = str.split(' ')
+    val monthObj = associatedMonths[month] ?: return ""
+    return if (day.toInt() in 1..monthObj.days(year.toInt())) {
+        val d = if (day.length == 1) "0" + day else day
+        "$d.${monthObj.number}.$year"
+    }
     else
         ""
 }
 
-private val monthArray = months.values.toTypedArray()
-private val monthNames = arrayOf("января", "февраля", "марта",
-                                "апреля", "мая", "июня",
-                                "июля", "августа", "сентября",
-                                "октября", "ноября", "декабря")
-
-private val dateDigitToStrRegex = Regex("^\\d{2}\\.\\d{2}\\.\\d+$")
+private val dateDigitToStrRegex = Regex("""^\d{2}\.\d{2}\.\d+$""")
 
 /**
  * Средняя
@@ -107,17 +118,17 @@ private val dateDigitToStrRegex = Regex("^\\d{2}\\.\\d{2}\\.\\d+$")
 fun dateDigitToStr(digital: String): String {
     if (!(digital matches dateDigitToStrRegex))
         return ""
-    val (data_num, month, year) = digital.split('.')
+    val (day, month, year) = digital.split('.')
     val m = month.toInt() - 1
-    val d = data_num.toInt()
-    return if (m in 0..11 && d in 1..monthArray[m].maxData)
+    val d = day.toInt()
+    return if (m in 0..11 && d in 1..months[m].days(year.toInt()))
         "$d ${monthNames[m]} ${year.toInt()}"
     else ""
 }
 
-private val telephoneRegex = Regex("^\\s*(\\+\\d+)?[\\s\\-]*(\\(\\d+\\))?([\\s\\-]*\\d)+\\s*$")
+private val telephoneRegex = Regex("""^\s*(\+\d+)?[\s\-]*(\(\d+\))?([\s\-]*\d)+\s*$""")
 
-private val telephoneRegexReplace = Regex("[\\Q-() \\E]")
+private val telephoneRegexReplace = Regex("""[\Q-() \E]""")
 
 /**
  * Средняя
@@ -134,13 +145,12 @@ private val telephoneRegexReplace = Regex("[\\Q-() \\E]")
 fun flattenPhoneNumber(phone: String): String =
     if (phone matches telephoneRegex)
         phone.replace(telephoneRegexReplace, "")
-        //phone.replace(" ", "").replace("-", "")
     else ""
 
 // Регулярное выражение не выдерживает агрессивно большого текста :(
 // private val bestLongJump_regex = Regex("^(\\d+|-|%)(\\s+(\\d+|-|%))*$")
 // Вместо будет нерекурсивная функция
-private fun bestLongJump_assert(string: String): Boolean {
+private fun bestLongJumpAssert(string: String): Boolean {
     if (string.isEmpty())
         return false
     if (string.first() == ' ' || string.last() == ' ')
@@ -173,14 +183,14 @@ private val bestLongJumpRegexNumbers = Regex("\\d+")
  */
 fun bestLongJump(jumps: String): Int {
 
-    var max_jump = -1
-    if (bestLongJump_assert(jumps))
+    var maxJump = -1
+    if (bestLongJumpAssert(jumps))
         for (num in bestLongJumpRegexNumbers.findAll(jumps)) {
             val curr = num.value.toInt()
-            if (curr > max_jump)
-                max_jump = curr
+            if (curr > maxJump)
+                maxJump = curr
         }
-    return max_jump
+    return maxJump
 }
 
 /**
@@ -278,10 +288,13 @@ private val mostExpensiveProduct = Regex("([а-я]|[А-Я]|Ё|ё|\\w)+")
 private val mostExpensivePrice = Regex("\\d+\\.\\d")
 */
 
-private val mostExpensiveRegex = Regex("^(\\S+ \\d+(\\.\\d+)?; )*(\\S+ \\d+(\\.\\d+)?)$")
-private val mostExpensiveEach = Regex("\\S+ \\d+(\\.\\d+)?")
-private val mostExpensiveProduct = Regex("\\S+")
-private val mostExpensivePrice = Regex("\\d+(\\.\\d+)?")
+private val word = "\\S+"
+private val price = """\d+(\.\d+)?"""
+private val each = "$word $price"
+private val mostExpensiveProduct = Regex(word)
+private val mostExpensivePrice = Regex(price)
+private val mostExpensiveEach = Regex(each)
+private val mostExpensiveRegex = Regex("^($each; )*($each)$")
 
 /**
  * Сложная

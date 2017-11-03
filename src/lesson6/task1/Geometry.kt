@@ -1,7 +1,7 @@
 @file:Suppress("UNUSED_PARAMETER")
 package lesson6.task1
 
-import lesson4.task1.center
+import lesson1.task1.sqr
 
 /**
  * Точка на плоскости
@@ -12,12 +12,14 @@ data class Point(val x: Double, val y: Double) {
      *
      * Рассчитать (по известной формуле) расстояние между двумя точками
      */
-    fun distance(other: Point): Double = Math.hypot(x - other.x, y - other.y)
+    fun distance(other: Point): Double = Math.sqrt(sqr(x - other.x) + sqr(y - other.y))
+
+    // Дальше идут методы Ktlo
 
     fun sqrDistance(other: Point): Double {
-        val delta_x = x - other.x
+        val deltaX = x - other.x
         val delta_y = y - other.y
-        return delta_x*delta_x + delta_y*delta_y
+        return deltaX*deltaX + delta_y*delta_y
     }
 
     operator fun plus(other: Point) = Point(x + other.x, y + other.y)
@@ -29,8 +31,6 @@ data class Point(val x: Double, val y: Double) {
     operator fun div(scalar: Double) = Point(x / scalar, y / scalar)
 
     val length get() = Math.hypot(x, y)
-
-    //val sqrLength get() = x*x + y*y
 }
 
 /**
