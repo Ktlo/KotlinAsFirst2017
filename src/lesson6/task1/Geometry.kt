@@ -18,8 +18,8 @@ data class Point(val x: Double, val y: Double) {
 
     fun sqrDistance(other: Point): Double {
         val deltaX = x - other.x
-        val delta_y = y - other.y
-        return deltaX*deltaX + delta_y*delta_y
+        val deltaY = y - other.y
+        return deltaX*deltaX + deltaY*deltaY
     }
 
     operator fun plus(other: Point) = Point(x + other.x, y + other.y)
@@ -29,8 +29,6 @@ data class Point(val x: Double, val y: Double) {
     operator fun times(other: Point) = x * other.x + y * other.y
 
     operator fun div(scalar: Double) = Point(x / scalar, y / scalar)
-
-    val length get() = Math.hypot(x, y)
 }
 
 /**
@@ -92,7 +90,7 @@ data class Circle(val center: Point, val radius: Double) {
      */
     fun distance(other: Circle): Double {
         val result = center.distance(other.center) - radius - other.radius
-        return if (result < .0) .0 else result
+        return Math.max(result, .0)
     }
 
     /**
@@ -122,29 +120,20 @@ data class Segment(val begin: Point, val end: Point) {
  */
 fun diameter(vararg points: Point): Segment {
     require(points.size >= 2)
-    var X = .0
-    var Y = .0
-    for ((x, y) in points) {
-        X += x
-        Y += y
-    }
-    val center = Point(X / points.size, Y / points.size)
-    var a = center
-    var dist = 0.0
-    for (point in points) {
-        val curr_dist = center.sqrDistance(point)
-        if (dist < curr_dist) {
-            a = point
-            dist = curr_dist
-        }
-    }
-    dist = .0
-    var b = a
-    for (point in points) {
-        val curr_dist = a.sqrDistance(point)
-        if (dist < curr_dist) {
-            b = point
-            dist = curr_dist
+
+    var a = points[0]
+    var b = points[1]
+    var distance = a.distance(b)
+    for (i in 0 until points.size) {
+        for (j in i+1 until points.size) {
+            val onePoint = points[i]
+            val otherPoint = points[j]
+            val newDistance = onePoint.distance(otherPoint)
+            if (newDistance > distance) {
+                a = onePoint
+                b = otherPoint
+                distance = newDistance
+            }
         }
     }
     return Segment(a, b)
@@ -179,14 +168,15 @@ class Line private constructor(val b: Double, val angle: Double) {
      * Для этого необходимо составить и решить систему из двух уравнений (каждое для своей прямой)
      */
     fun crossPoint(other: Line): Point {
-        val a1_sin = Math.sin(angle)
-        val a2_sin = Math.sin(other.angle)
-        val a1_cos = Math.cos(angle)
-        val a2_cos = Math.cos(other.angle)
+        val a1Sin = Math.sin(angle)
+        val a2Sin = Math.sin(other.angle)
+        val a1Cos = Math.cos(angle)
+        val a2Cos = Math.cos(other.angle)
 
-        val x = (b / a1_cos - other.b / a2_cos) / (a2_sin / a2_cos - a1_sin / a1_cos)
+        val x = (b / a1Cos - other.b / a2Cos) / (a2Sin / a2Cos - a1Sin / a1Cos)
+        val y = (x * a2Sin + other.b)/a2Cos
 
-        return Point(x, (x * a2_sin + other.b)/a2_cos)
+        return Point(x, y)
     }
 
     override fun equals(other: Any?) = other is Line && angle == other.angle && b == other.b
@@ -226,10 +216,9 @@ fun lineByPoints(a: Point, b: Point): Line = lineBySegment(Segment(a, b))
  * Построить серединный перпендикуляр по отрезку или по двум точкам
  */
 fun bisectorByPoints(a: Point, b: Point): Line {
-    val delta = a - b
-    val center = (a + b) / 2.0
-    val angle = normalizeAngle(Math.acos(delta.x/delta.length) + Math.PI / 2)
-    return Line(center, angle)
+    val angle = -Math.atan((a.x-b.x)/(a.y-b.y))
+    val r = Line((a + b) / 2.0, angle)
+    return r
 }
 
 /**
@@ -267,11 +256,11 @@ fun findNearestCirclePair(vararg circles: Circle): Pair<Circle, Circle> {
  * построить окружность, описанную вокруг треугольника - эквивалентная задача).
  */
 fun circleByThreePoints(a: Point, b: Point, c: Point): Circle {
-    // My oldest fear...
-    val x = ( ((a.x*a.x-b.x*b.x) + (a.y*a.y-b.y*b.y))/(a.y-b.y) - ((b.x*b.x-c.x*c.x) + (b.y*b.y-c.y*c.y))/(b.y-c.y) ) / (2*((c.x-b.x)/(b.y-c.y) - (b.x-a.x)/(a.y-b.y)))
-    val y = ( 2*x*(b.x - a.x) + (a.x*a.x - b.x*b.x) + (a.y*a.y - b.y*b.y) )/(2*(a.y - b.y))
-    val r = Math.hypot(x - a.x, y - a.y)
-    return Circle(Point(x, y), r)
+    val line1 = bisectorByPoints(a, b)
+    val line2 = bisectorByPoints(b, c)
+    val center = line2.crossPoint(line1)
+    val radius = center.distance(a)
+    return Circle(center, radius)
 }
 
 /**

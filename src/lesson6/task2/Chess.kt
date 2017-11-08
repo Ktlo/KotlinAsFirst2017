@@ -23,7 +23,10 @@ data class Square(val column: Int, val row: Int) {
      * В нотации, колонки обозначаются латинскими буквами от a до h, а ряды -- цифрами от 1 до 8.
      * Для клетки не в пределах доски вернуть пустую строку
      */
-    fun notation(): String = if (inside()) "${(column + ('a' - 1).toInt()).toChar()}$row" else ""
+    fun notation(): String = if (inside()) {
+        val columnLetter = (column + 96).toChar()
+        "$columnLetter$row"
+    } else ""
 }
 
 /**
@@ -34,8 +37,10 @@ data class Square(val column: Int, val row: Int) {
  * Если нотация некорректна, бросить IllegalArgumentException
  */
 fun square(notation: String): Square {
-    require(notation.length == 2 && notation[0] in 'a'..'h' && notation[1] in '1'..'8')
-    return Square(notation[0] - 'a' + 1, notation[1] - '0')
+    require(notation.length == 2)
+    val (column, row) = notation.toCharArray()
+    require(column in 'a'..'h' && row in '1'..'8')
+    return Square(column - '`', row - '0')
 }
 
 /**
@@ -119,7 +124,7 @@ fun bishopMoveNumber(start: Square, end: Square): Int {
 
     return when {
         start == end -> 0
-        (start.column - end.column) and 1 != (start.row - end.row) and 1 -> -1
+        (start.column - end.column) % 2 != (start.row - end.row) % 2 -> -1
         Math.abs(start.column - end.column) == Math.abs(start.row - end.row) -> 1
         else -> 2
     }
@@ -148,13 +153,16 @@ fun bishopTrajectory(start: Square, end: Square): List<Square> = when (bishopMov
     0 -> listOf(start)
     1 -> listOf(start, end)
     else -> {
-        val firstWay = Square(Math.abs((end.column + start.column + end.row - start.row) / 2),
-                Math.abs((end.row + start.row + end.column - start.column) / 2))
+        val column1 = Math.abs((end.column + start.column + end.row - start.row) / 2)
+        val row1 = Math.abs((end.row + start.row + end.column - start.column) / 2)
+        val firstWay = Square(column1, row1)
         if (firstWay.inside())
             listOf(start, firstWay, end)
-        else
-            listOf(start, Square(Math.abs((end.column - start.column - end.row + start.row) / 2),
-                    Math.abs((end.row + start.row - end.column + start.column) / 2)), end)
+        else {
+            val column2 = Math.abs((end.column - start.column - end.row + start.row) / 2)
+            val row2 = Math.abs((end.row + start.row - end.column + start.column) / 2)
+            listOf(start, Square(column2, row2), end)
+        }
     }
 }
 
@@ -180,8 +188,9 @@ fun bishopTrajectory(start: Square, end: Square): List<Square> = when (bishopMov
  */
 fun kingMoveNumber(start: Square, end: Square): Int {
     require(start.inside() && end.inside())
-
-    return Math.max(Math.abs(start.column - end.column), Math.abs(start.row - end.row))
+    val deltaColumn = Math.abs(start.column - end.column)
+    val deltaRow = Math.abs(start.row - end.row)
+    return Math.max(deltaColumn, deltaRow)
 }
 
 /**
