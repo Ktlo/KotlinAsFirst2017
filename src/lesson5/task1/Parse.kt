@@ -205,46 +205,22 @@ fun bestLongJump(jumps: String): Int {
  */
 fun bestHighJump(jumps: String): Int {
     var lastInd = 0
-    var maxHeight = 0
+    var maxHeight = -1
     if (jumps.isBlank())
         return -1
-    for (part in Regex("""\S+ \S+""").findAll(jumps)) {
+    for (part in Regex("""\S+\s+\S+""").findAll(jumps)) {
+        lastInd = part.range.last
         val jump = Regex("""(\d+) ([+\-%]+)""").find(part.value) ?: return -1
         if ('+' in jump.groups[2]!!.value) {
             val height = jump.groups[1]!!.value.toInt()
             if (height > maxHeight)
                 maxHeight = height
         }
-        lastInd = part.range.last
     }
-    if (lastInd != jumps.length - 1)
+    if (lastInd != jumps.length - 1) {
         return -1
-    return maxHeight
-    /*
-    var isNum = true
-    var max = -1
-    var curr = 0
-    for (string in jumps.split(' ')) {
-        if (isNum) {
-            if (string matches Regex("\\d+"))
-                curr = string.toInt()
-            else
-                return -1
-        }
-        else {
-            if (string matches Regex("[-+%]+")) {
-                if ('+' in string) {
-                    if (curr > max)
-                        max = curr
-                }
-            }
-            else
-                return -1
-        }
-        isNum = !isNum
     }
-    return max
-    */
+    return maxHeight
 }
 
 private val plusMinusAssertRegex = Regex("\\d+( [+\\-] \\d+)*")
