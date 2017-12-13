@@ -204,6 +204,23 @@ fun bestLongJump(jumps: String): Int {
  * При нарушении формата входной строки вернуть -1.
  */
 fun bestHighJump(jumps: String): Int {
+    var lastInd = 0
+    var maxHeight = 0
+    if (jumps.isBlank())
+        return -1
+    for (part in Regex("""\S+ \S+""").findAll(jumps)) {
+        val jump = Regex("""(\d+) ([+\-%]+)""").find(part.value) ?: return -1
+        if ('+' in jump.groups[2]!!.value) {
+            val height = jump.groups[1]!!.value.toInt()
+            if (height > maxHeight)
+                maxHeight = height
+        }
+        lastInd = part.range.last
+    }
+    if (lastInd != jumps.length - 1)
+        return -1
+    return maxHeight
+    /*
     var isNum = true
     var max = -1
     var curr = 0
@@ -227,6 +244,7 @@ fun bestHighJump(jumps: String): Int {
         isNum = !isNum
     }
     return max
+    */
 }
 
 private val plusMinusAssertRegex = Regex("\\d+( [+\\-] \\d+)*")
@@ -288,11 +306,9 @@ private val mostExpensiveProduct = Regex("([а-я]|[А-Я]|Ё|ё|\\w)+")
 private val mostExpensivePrice = Regex("\\d+\\.\\d")
 */
 
-private val word = "\\S+"
-private val price = """\d+(\.\d+)?"""
+private val word = "(\\S+)"
+private val price = """(\d+(\.\d+)?)"""
 private val each = "$word $price"
-private val mostExpensiveProduct = Regex(word)
-private val mostExpensivePrice = Regex(price)
 private val mostExpensiveEach = Regex(each)
 private val mostExpensiveRegex = Regex("^($each; )*($each)$")
 
@@ -313,10 +329,10 @@ fun mostExpensive(description: String): String {
     var max_price = .0
     var product_name = ""
     for (each in mostExpensiveEach.findAll(description)) {
-        val price = mostExpensivePrice.find(each.value)!!.value.toDouble()
+        val price = each.groups[2]!!.value.toDouble()
         if (price > max_price) {
             max_price = price
-            product_name = mostExpensiveProduct.find(each.value)!!.value
+            product_name = each.groups[1]!!.value
         }
     }
     return product_name

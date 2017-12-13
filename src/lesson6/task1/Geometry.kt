@@ -14,22 +14,23 @@ data class Point(val x: Double, val y: Double) {
      */
     fun distance(other: Point): Double = Math.sqrt(sqr(x - other.x) + sqr(y - other.y))
 
-    // Дальше идут методы Ktlo
-
-    fun sqrDistance(other: Point): Double {
-        val deltaX = x - other.x
-        val deltaY = y - other.y
-        return deltaX*deltaX + deltaY*deltaY
-    }
-
-    operator fun plus(other: Point) = Point(x + other.x, y + other.y)
-
-    operator fun minus(other: Point) = Point(x - other.x, y - other.y)
-
-    operator fun times(other: Point) = x * other.x + y * other.y
-
-    operator fun div(scalar: Double) = Point(x / scalar, y / scalar)
 }
+
+// Дальше идут методы Ktlo
+
+fun Point.sqrDistance(other: Point): Double {
+    val deltaX = x - other.x
+    val deltaY = y - other.y
+    return deltaX * deltaX + deltaY * deltaY
+}
+
+operator fun Point.plus(other: Point) = Point(x + other.x, y + other.y)
+
+operator fun Point.minus(other: Point) = Point(x - other.x, y - other.y)
+
+operator fun Point.times(other: Point) = x * other.x + y * other.y
+
+operator fun Point.div(scalar: Double) = Point(x / scalar, y / scalar)
 
 /**
  * Треугольник, заданный тремя точками (a, b, c, см. constructor ниже).
